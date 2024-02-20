@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuUndoCollection"
+        android:icon="@android:drawable/ic_menu_revert"
+        android:title=". ."/>
+    <item android:title="컬렉션1"/>
+    <item android:title="컬렉션2"/>
+    <item
+        android:id="@+id/menuAddCollection"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="하위 컬렉션 생성"/>
+    <item
+        android:id="@+id/menuUpdateCollection"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="이름 변경"/>
+    <item
+        android:id="@+id/menuDeleteCollection"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:title="삭제"/>
+
+</menu>

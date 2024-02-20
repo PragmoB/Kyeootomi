@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="contents_providers">
+        <item>hitomi</item>
+        <item>custom</item>
+    </string-array>
+    <string-array name="name_contents_providers">
+        <item>히토미(hitomi.la)</item>
+        <item>사용자 지정</item>
+    </string-array>
+</resources>

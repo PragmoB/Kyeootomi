@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Kyeootomi</string>
+    <string name="app_name">켜토미</string>
+    <string name="drawer_opened">opened</string>
+    <string name="drawer_closed">closed</string>
 </resources>

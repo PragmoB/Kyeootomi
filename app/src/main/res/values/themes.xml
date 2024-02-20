@@ -2,8 +2,12 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.Kyeootomi" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/primary</item>
     </style>
 
     <style name="Theme.Kyeootomi" parent="Base.Theme.Kyeootomi" />
+    <style name="RoundedShape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">200dp</item> <!-- 조절하고자 하는 둥글기의 정도 -->
+    </style>
 </resources>

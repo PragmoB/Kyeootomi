@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:background="@color/primary">
+
+    <TextView
+        android:id="@+id/txtTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/txtPath"
+        android:layout_alignLeft="@id/txtPath"
+        android:layout_marginBottom="5dp"
+        android:text="내 컬렉션"
+        android:textColor="@color/white"
+        android:textSize="25sp"/>
+
+    <TextView
+        android:id="@+id/txtPath"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="컬렉션 > 컬렉렉션"
+        android:textColor="@color/white"
+        android:textSize="12sp" />
+
+</RelativeLayout>

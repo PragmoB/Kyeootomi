@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/menuUndoCollection"
+        android:id="@+id/menuRevertCollection"
         android:icon="@android:drawable/ic_menu_revert"
         android:title=". ."/>
-    <item android:title="컬렉션1"/>
-    <item android:title="컬렉션2"/>
     <item
         android:id="@+id/menuAddCollection"
         android:icon="@android:drawable/ic_menu_add"

@@ -13,13 +13,13 @@
         android:theme="@style/Theme.Kyeootomi"
         tools:targetApi="31">
         <activity
-            android:name=".AddCollectionActivity"
+            android:name=".view.activity.AddCollectionActivity"
             android:exported="false" />
         <activity
-            android:name=".AddItemActivity"
+            android:name=".view.activity.AddItemActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".view.activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

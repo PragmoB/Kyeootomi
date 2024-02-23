@@ -1,8 +1,9 @@
-package com.pragmo.kyeootomi
+package com.pragmo.kyeootomi.view.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
+import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityAddCollectionBinding
 
 class AddCollectionActivity : AppCompatActivity() {

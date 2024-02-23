@@ -1,35 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
-
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.pragmo.kyeootomi.viewmodel.AddItemViewModel"/>
+    </data>
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="컨텐츠 제공 업체"/>
-        <Spinner
-            android:id="@+id/spinContentsProvider"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:entries="@array/name_contents_providers"/>
-        <FrameLayout
-            android:id="@+id/fragmentInput"
+            style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
+
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="30dp"/>
+            android:padding="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="컨텐츠 제공 업체"/>
+            <Spinner
+                android:id="@+id/spinContentsProvider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:onItemSelected="@{viewModel::onContentsProviderSelected}"
+                android:entries="@array/name_contents_providers"/>
+            <FrameLayout
+                android:id="@+id/fragmentInput"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="30dp"/>
+        </LinearLayout>
+
     </LinearLayout>
 
-</LinearLayout>
+</layout>

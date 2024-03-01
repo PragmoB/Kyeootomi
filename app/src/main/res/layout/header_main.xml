@@ -23,7 +23,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
-        android:text="컬렉션 > 컬렉렉션"
+        android:text=""
         android:textColor="@color/white"
         android:textSize="12sp" />
 

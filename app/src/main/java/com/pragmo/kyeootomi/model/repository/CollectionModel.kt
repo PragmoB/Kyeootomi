@@ -1,0 +1,129 @@
+package com.pragmo.kyeootomi.model.repository
+
+import android.content.ContentValues
+import android.content.Context
+import com.pragmo.kyeootomi.model.data.Collection
+import java.io.File
+
+class CollectionModel(private val context : Context) {
+
+    /*  numCollection번 컬렉션에 collectionName인 하위 컬렉션 생성 */
+
+    fun add(numCollection : Int?, name : String) {
+
+        /* 디렉터리 추가 */
+
+        if (numCollection != null) {
+            val collection = File(context.filesDir.absolutePath + "/" + numCollection, name)
+            if (!collection.exists())
+                collection.mkdir()
+        }
+
+        /* DB에 등록 */
+
+        val db = CollectionDBHelper(context).writableDatabase
+        val values = ContentValues()
+        if (numCollection != null)
+            values.put("collection", numCollection)
+        else
+            values.putNull("collection")
+        values.put("name", name)
+        db.insert("Collection", null, values)
+    }
+
+    /* numCollection번 컬렉션의 모든 하위 컬렉션 조회 */
+
+    fun getSubCollections(numCollection : Int?) : List<Collection> {
+        val db = CollectionDBHelper(context).readableDatabase
+        val listCollection = mutableListOf<Collection>()
+        val cursor = db.query("Collection", arrayOf("_no", "name"),
+                if (numCollection == null)
+                    "collection IS NULL"
+                else
+                    "collection=?",
+                if (numCollection == null)
+                    null
+                else
+                    arrayOf(numCollection?.toString()),
+            null, null, null)
+
+        while (cursor.moveToNext())
+            listCollection.add(Collection(cursor.getInt(0), numCollection,
+                cursor.getString(1)))
+
+        cursor.close()
+        return listCollection.toList()
+    }
+
+    /* numCollection번 컬렉션 정보 조회 */
+
+    fun get(numCollection: Int?) : Collection? {
+        if (numCollection == null)
+            return Collection(null, null, "내 컬렉션")
+
+        val db = CollectionDBHelper(context).readableDatabase
+        val cursor = db.query("Collection", arrayOf("collection", "name"),
+            "_no=?", arrayOf(numCollection.toString()), null, null, null)
+
+        val ret = if (cursor.moveToNext())
+            Collection(numCollection,
+                if (cursor.isNull(0)) null else cursor.getInt(0),
+                cursor.getString(1))
+        else
+            null
+
+        cursor.close()
+        return ret
+    }
+
+    /* numCollection번 컬렉션의 경로 조회 */
+
+    fun getPath(numCollection: Int?) : String {
+        val db = CollectionDBHelper(context).readableDatabase
+        var result = ""
+        var num = numCollection
+
+        while (num != null) {
+            val cursor = db.query("Collection", arrayOf("collection", "name"), "_no=?",
+                arrayOf(num.toString()), null, null, null)
+            if (!cursor.moveToNext())
+                return "error loading path"
+
+            result = "/" + cursor.getString(1) + result
+            num = if (cursor.isNull(0))
+                null
+            else
+                cursor.getInt(0)
+            cursor.close()
+        }
+        return "내 컬렉션$result"
+    }
+
+    /* numCollection번 컬렉션의 이름 name로 변경 */
+
+    fun update(numCollection : Int, name : String) {
+        val db = CollectionDBHelper(context).writableDatabase
+        val values = ContentValues()
+        values.put("name", name)
+        db.update("Collection", values, "_no=?", arrayOf(numCollection.toString()))
+    }
+
+    /* numCollection번 컬렉션 및 하위 컬렉션, 하위 작품 삭제 */
+
+    fun delete(numCollection: Int?) {
+
+        // numCollection번 컬렉션 및 numCollection번 컬렉션의 작품 삭제
+        val itemModel = ItemModel(context)
+        val db = CollectionDBHelper(context).writableDatabase
+        if (numCollection != null)
+            db.delete("Collection", "_no=?", arrayOf(numCollection.toString()))
+        itemModel.deleteByCollection(numCollection)
+
+        // numCollection번 컬렉션의 하위 컬렉션 모두 삭제
+        val subCollections = getSubCollections(numCollection)
+        for (subCollection in subCollections)
+            delete(subCollection.num)
+
+        return
+    }
+}

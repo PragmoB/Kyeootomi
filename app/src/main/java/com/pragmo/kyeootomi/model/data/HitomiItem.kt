@@ -1,3 +1,11 @@
 package com.pragmo.kyeootomi.model.data
 
-data class HitomiItem(var collection: String, var title : String?, var number : Int, var downloaded: Boolean)
+class HitomiItem : Item {
+
+    var number : Int
+    var downloaded: Boolean
+    constructor(item : Item, number : Int, downloaded: Boolean) : super(item) {
+        this.number = number
+        this.downloaded = downloaded
+    }
+}

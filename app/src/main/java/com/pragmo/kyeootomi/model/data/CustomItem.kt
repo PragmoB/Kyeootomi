@@ -1,3 +1,10 @@
 package com.pragmo.kyeootomi.model.data
 
-data class CustomItem(var collection : String, var title : String, var url: String)
+class CustomItem : Item {
+
+    var url: String
+
+    constructor(item : Item, url : String) : super(item) {
+        this.url = url
+    }
+}

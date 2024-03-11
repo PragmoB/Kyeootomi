@@ -59,8 +59,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
         toggle.syncState()
 
+        /* 레이아웃 조정 */
+
+        binding.refreshDocument.setDistanceToTriggerSync(350)
+
         /* 이벤트 콜백 설정 */
 
+        binding.refreshDocument.setOnRefreshListener {
+            viewModel.loadItems()
+            binding.refreshDocument.isRefreshing = false
+        }
+        binding.scrollView.viewTreeObserver.addOnScrollChangedListener {
+            binding.refreshDocument.isEnabled = binding.scrollView.scrollY == 0
+        }
         binding.btnAddItem.setOnClickListener {
             val intentAddItem = Intent(this, AddItemActivity::class.java)
             intentAddItem.putExtra("numCollection", viewModel.collection.value!!.num)

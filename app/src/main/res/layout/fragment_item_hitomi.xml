@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="300dp">
+    android:layout_height="wrap_content">
     <FrameLayout
         android:id="@+id/cover"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="300dp"
         android:layout_margin="5dp">
         <ImageView
             android:id="@+id/imgCover"
@@ -40,13 +41,21 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="300dp"
         android:layout_margin="5dp">
 
+        <TextView
+            android:id="@+id/txtNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:text="번호"/>
         <TextView
             android:id="@+id/txtWriter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:textSize="13sp"
             android:text="작가"/>
         <TextView
@@ -63,6 +72,14 @@
             android:layout_marginTop="5dp"
             android:textSize="13sp"
             android:text="태그"/>
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/tags"
+            android:layout_marginTop="1dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:flexWrap="wrap">
+
+        </com.google.android.flexbox.FlexboxLayout>
 
         <Space
             android:layout_width="0dp"

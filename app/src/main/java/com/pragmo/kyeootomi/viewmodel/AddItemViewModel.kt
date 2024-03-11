@@ -3,6 +3,7 @@ package com.pragmo.kyeootomi.viewmodel
 import android.app.Application
 import android.view.View
 import android.widget.AdapterView
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -53,30 +54,46 @@ class AddItemViewModel(application: Application): AndroidViewModel(application) 
         this._numCollection.value = numCollection
     }
     fun onTitleChanged(s : CharSequence, start : Int, before : Int, count : Int) {
-        this._title.value = s.toString()
+        if (s.isEmpty())
+            this._title.value = null
+        else
+            this._title.value = s.toString()
     }
     fun onNumberChanged(s : CharSequence, start : Int, before : Int, count : Int) {
-        this._number.value = s.toString().toInt()
+        if (s.isEmpty())
+            this._number.value = null
+        else
+            this._number.value = s.toString().toInt()
     }
     fun onUrlChanged(s : CharSequence, start : Int, before : Int, count : Int) {
-        this._url.value = s.toString()
+        if (s.isEmpty())
+            this._url.value = null
+        else
+            this._url.value = s.toString()
     }
     fun setDownloaded(downloaded : Boolean) {
         this._downloaded.value = downloaded
     }
 
     fun commit() : Boolean {
+        val onCommitComplete : (Boolean) -> Unit = { isSucceed ->
+            if (isSucceed)
+                Toast.makeText(getApplication(), "추가되었습니다", Toast.LENGTH_SHORT).show()
+        }
         when (_contentsProvider.value) {
             "hitomi" -> {
-                val item = Item("hitomi", _numCollection.value, _title.value?:"")
+                if (_useTitle.value?:return false)
+                    _title.value?:return false
+                val item = Item("hitomi", 0, _numCollection.value, _title.value)
                 val hitomiItem = HitomiItem(
                     item,
                     _number.value?:return false,
                     _downloaded.value?:return false)
-                return itemModel.addHitomi(hitomiItem, useTitle.value?:return false)
+                itemModel.addHitomi(hitomiItem, useTitle.value?:return false, onCommitComplete)
+                return true
             }
             "custom" -> {
-                val item = Item("custom", _numCollection.value, title.value?:return false)
+                val item = Item("custom", 0, _numCollection.value, title.value?:return false)
                 val customItem = CustomItem(
                     item,
                     url.value?:return false)

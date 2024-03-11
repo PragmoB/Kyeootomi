@@ -11,24 +11,25 @@ class CollectionModel(private val context : Context) {
 
     fun add(numCollection : Int?, name : String) {
 
-        /* 디렉터리 추가 */
-
-        if (numCollection != null) {
-            val collection = File(context.filesDir.absolutePath + "/" + numCollection, name)
-            if (!collection.exists())
-                collection.mkdir()
-        }
-
         /* DB에 등록 */
 
         val db = CollectionDBHelper(context).writableDatabase
         val values = ContentValues()
-        if (numCollection != null)
-            values.put("collection", numCollection)
-        else
-            values.putNull("collection")
+        if (numCollection != null) values.put("collection", numCollection)
+        else values.putNull("collection")
         values.put("name", name)
         db.insert("Collection", null, values)
+
+        /* 디렉터리 추가 */
+
+        val cursor = db.query("Collection", arrayOf("_no"), null,
+            null, null, null, "_no DESC")
+        cursor.moveToNext()
+        val collection = File(context.filesDir, "${cursor.getInt(0)}")
+        if (!collection.exists())
+            collection.mkdirs()
+
+        cursor.close()
     }
 
     /* numCollection번 컬렉션의 모든 하위 컬렉션 조회 */
@@ -37,14 +38,10 @@ class CollectionModel(private val context : Context) {
         val db = CollectionDBHelper(context).readableDatabase
         val listCollection = mutableListOf<Collection>()
         val cursor = db.query("Collection", arrayOf("_no", "name"),
-                if (numCollection == null)
-                    "collection IS NULL"
-                else
-                    "collection=?",
-                if (numCollection == null)
-                    null
-                else
-                    arrayOf(numCollection?.toString()),
+                if (numCollection == null) "collection IS NULL"
+                else "collection=?",
+                if (numCollection == null) null
+                else arrayOf(numCollection?.toString()),
             null, null, null)
 
         while (cursor.moveToNext())

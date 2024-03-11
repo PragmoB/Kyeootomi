@@ -11,16 +11,19 @@ class ItemDBHelper(context: Context) : SQLiteOpenHelper(context, "item_db", null
                     "_no INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
                     "collection INT," +
                     "date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP," +
-                    "title TEXT NOT NULL," +
+                    "title TEXT," +
                     "number INTEGER NOT NULL," +
-                    "downloaded INTEGER NOT NULL)"
+                    "downloaded INTEGER NOT NULL," +
+                    "artist TEXT," +
+                    "series TEXT," +
+                    "tags TEXT)"
         )
         db?.execSQL(
             "CREATE TABLE CustomItem (" +
                     "_no INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
                     "collection INT," +
                     "date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP," +
-                    "title TEXT NOT NULL," +
+                    "title TEXT," +
                     "URL TEXT NOT NULL)"
         )
     }

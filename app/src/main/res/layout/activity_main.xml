@@ -27,18 +27,24 @@
                     android:layout_height="wrap_content"
                     style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
             </com.google.android.material.appbar.AppBarLayout>
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/rootMain"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/refreshDocument"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerDocument"
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/scrollView"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
-                </androidx.recyclerview.widget.RecyclerView>
-            </androidx.core.widget.NestedScrollView>
+                    android:layout_height="match_parent">
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recyclerDocument"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
+                        </androidx.recyclerview.widget.RecyclerView>
+                </androidx.core.widget.NestedScrollView>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/btnAddItem"
                 android:layout_width="wrap_content"
@@ -46,7 +52,7 @@
                 app:backgroundTint="@color/primary"
                 app:iconTint="@color/white"
                 app:icon="@android:drawable/ic_input_add"
-                app:layout_anchor="@id/rootMain"
+                app:layout_anchor="@id/scrollView"
                 app:layout_anchorGravity="bottom|right"
                 android:layout_margin="30dp"
                 app:shapeAppearanceOverlay="@style/RoundedShape"/>

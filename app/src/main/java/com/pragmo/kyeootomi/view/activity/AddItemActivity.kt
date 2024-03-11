@@ -61,9 +61,8 @@ class AddItemActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menuComplete -> {
-                if (viewModel.commit())
-                {
-                    Toast.makeText(this, "추가되었습니다", Toast.LENGTH_SHORT).show()
+                if (viewModel.commit()) {
+                    Toast.makeText(this, "추가 중 입니다 잠시만 기다려주세요", Toast.LENGTH_SHORT).show()
                     finish()
                 }
                 else

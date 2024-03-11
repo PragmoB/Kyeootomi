@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView android:id="@+id/rootMain"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/ic_hitomi_tag"
+    android:textColor="@color/white"
+    android:text="female:sole_female"
+    android:paddingHorizontal="5dp"
+    android:layout_margin="3dp"
+    android:textSize="11sp"
+    xmlns:android="http://schemas.android.com/apk/res/android" />

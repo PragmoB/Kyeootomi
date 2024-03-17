@@ -89,14 +89,14 @@ class AddItemViewModel(application: Application): AndroidViewModel(application) 
                     item,
                     _number.value?:return false,
                     _downloaded.value?:return false)
-                itemModel.addHitomi(hitomiItem, useTitle.value?:return false, onCommitComplete)
+                itemModel.addHitomi(hitomiItem, _useTitle.value?:return false, onCommitComplete)
                 return true
             }
             "custom" -> {
-                val item = Item("custom", 0, _numCollection.value, title.value?:return false)
+                val item = Item("custom", 0, _numCollection.value, _title.value?:return false)
                 val customItem = CustomItem(
                     item,
-                    url.value?:return false)
+                    _url.value?:return false)
                 return itemModel.addCustom(customItem)
             }
             else -> return false

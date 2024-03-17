@@ -11,11 +11,12 @@
         android:layout_margin="5dp">
         <ImageView
             android:id="@+id/imgCover"
+            android:scaleType="fitStart"
             android:layout_width="wrap_content"
+            android:maxWidth="170dp"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
-            android:visibility="gone"
-            android:src="@drawable/img_unloadable"/>
+            android:visibility="gone"/>
         <RelativeLayout
             android:layout_width="130dp"
             android:layout_height="match_parent"

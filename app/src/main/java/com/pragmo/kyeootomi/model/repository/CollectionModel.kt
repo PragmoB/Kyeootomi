@@ -19,17 +19,6 @@ class CollectionModel(private val context : Context) {
         else values.putNull("collection")
         values.put("name", name)
         db.insert("Collection", null, values)
-
-        /* 디렉터리 추가 */
-
-        val cursor = db.query("Collection", arrayOf("_no"), null,
-            null, null, null, "_no DESC")
-        cursor.moveToNext()
-        val collection = File(context.filesDir, "${cursor.getInt(0)}")
-        if (!collection.exists())
-            collection.mkdirs()
-
-        cursor.close()
     }
 
     /* numCollection번 컬렉션의 모든 하위 컬렉션 조회 */

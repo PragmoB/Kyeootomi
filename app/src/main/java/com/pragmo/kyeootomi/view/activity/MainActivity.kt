@@ -116,8 +116,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return super.onOptionsItemSelected(item)
     }
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        val startTransformIntent = Intent(this, DrawerTransformActivity::class.java)
-
         val formCollectionBinding = DialogFormCollectionBinding.inflate(layoutInflater)
         formCollectionBinding.lifecycleOwner = this
         formCollectionBinding.viewModel = viewModel
@@ -127,8 +125,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         when (item.itemId) {
             R.id.menuRevertCollection -> {
-                viewModel.revertCollection()
-                startActivity(startTransformIntent) // 컬렉션 리스트 변경사항 출력을 위한 화면전환
+                // onNavigationItemSelected 콜백 실행 시점에 naviView.menu.clear()가 안먹는 문제가 있었음.
+                // 안드로이드 초짜라서 처음엔 액티비티를 껏다켜서 onResume() 상태를 만드는 방법으로 어떻게든 굴러가게 만들었는데,
+                // Handler.post라는 좋은 방법을 알게되었다
+                Handler(mainLooper).post {
+                    viewModel.revertCollection()
+                }
             }
             R.id.menuAddCollection -> {
                 formCollectionBinding.editCollectionName.requestFocus()
@@ -175,8 +177,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             else -> {
                 binding.drawer.close()
-                viewModel.setCollection(item.itemId)
-                startActivity(startTransformIntent) // 컬렉션 리스트 변경사항 출력을 위한 화면전환
+                Handler(mainLooper).post {
+                    viewModel.setCollection(item.itemId)
+                }
             }
         }
         return true

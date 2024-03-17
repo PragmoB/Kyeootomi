@@ -160,6 +160,12 @@ class ItemModel(private val context : Context) {
         }, 6000)
     }
     private fun getHitomiInfo(number : Int, onComplete : (Bundle?) -> Unit) {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivityManager.activeNetwork == null) {
+            Toast.makeText(context, "네트워크 연결이 불안정하여 히토미 ${number}번 작품 정보 로딩에 실패하였습니다", Toast.LENGTH_SHORT).show()
+            onComplete(null)
+            return
+        }
 
         val bun = Bundle()
 
@@ -176,30 +182,11 @@ class ItemModel(private val context : Context) {
                     view.loadUrl("javascript:window.Android.getInfoHtml(document.getElementsByTagName('body')[0].innerHTML);")
 
             }
-
-            override fun onReceivedError(
-                view: WebView?,
-                request: WebResourceRequest?,
-                error: WebResourceError?
-            ) {
-                super.onReceivedError(view, request, error)
-                request?.url?.let {
-                    // loadUrl로 요청한 hitomi.la 도메인이 아닌, 받아온 html의 href속성의 링크 요청도 걸리는걸 확인했기에 중복 방지를 위하여 검사함
-                    if (it.toString().startsWith("https://hitomi.la")) {
-                        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                        if (connectivityManager.activeNetwork != null) {
-                            view?.loadUrl(it.toString())
-                        }
-                        else
-                            onComplete.invoke(null)
-                    }
-                }
-            }
         }
         class MyJavascriptInterface {
             // 각각의 이벤트를 한 번만 실행하기 위한 플래그
-            private var completeGetGallery = false
-            private var completeGetInfo = false
+            var completeGetGallery = false
+            var completeGetInfo = false
 
             @JavascriptInterface
             fun getGalleryHtml(html: String) {
@@ -264,12 +251,20 @@ class ItemModel(private val context : Context) {
                 onComplete.invoke(bun)
             }
         }
-        webView.addJavascriptInterface(MyJavascriptInterface(), "Android")
+        val javascriptInterface = MyJavascriptInterface()
+        webView.addJavascriptInterface(javascriptInterface, "Android")
         webView.settings.javaScriptEnabled = true
         webView.visibility = View.VISIBLE
         webView.webViewClient = onLoad
 
         webView.loadUrl("https://hitomi.la/reader/$number.html#1")
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (!javascriptInterface.completeGetInfo) {
+                Toast.makeText(context, "히토미 ${number}번 작품 정보 로드 실패", Toast.LENGTH_SHORT).show()
+                javascriptInterface.completeGetInfo = true
+                onComplete(null)
+            }
+        }, 11000)
     }
 
     fun addHitomi(item : HitomiItem, useTitle : Boolean, onComplete : (Boolean) -> Unit) {

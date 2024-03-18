@@ -320,9 +320,15 @@ class ItemModel(private val context : Context) {
             item._no = cursor.getInt(0)
             cursor.close()
 
-            val itemDirectory = "/Kyeootomi/${item.numCollection?:0}/${item._no}"
+            val itemDirectory = "/.Kyeootomi/${item.numCollection?:0}/${item._no}"
             Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS + itemDirectory).mkdirs()
+            val nomedia = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS + "/.Kyeootomi"), ".nomedia")
+            if (!nomedia.exists())
+                nomedia.createNewFile()
+
+            if (bun == null)
+                return@onGetInfoComplete
 
             /* 여기서부터는 작품 표지 이미지파일 다운로드 */
 
@@ -354,8 +360,8 @@ class ItemModel(private val context : Context) {
              * => 시간이 별 차이가 없다. 그냥 단일로 감
              * */
             if (item.downloaded) {
-                val count = bun?.getInt("count")
-                count?.let {
+                val count = bun.getInt("count")
+                count.let {
                     Handler(Looper.getMainLooper()).post {
                         downloadHitomi(item.number, (1..it).toMutableList(),itemDirectory)
                     }

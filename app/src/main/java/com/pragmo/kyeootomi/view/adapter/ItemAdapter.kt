@@ -1,5 +1,8 @@
 package com.pragmo.kyeootomi.view.adapter
 
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +19,7 @@ import com.pragmo.kyeootomi.model.data.CustomItem
 import com.pragmo.kyeootomi.model.data.HitomiItem
 import com.pragmo.kyeootomi.model.data.Item
 import com.pragmo.kyeootomi.view.ToggleAnimation
+import java.io.File
 
 class ItemAdapter(private var items : List<Item>)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -56,6 +60,16 @@ class ItemAdapter(private var items : List<Item>)
                         viewTag.rootMain.text = tag
                         fragmentHitomiBinding.tags.addView(viewTag.root)
                     }
+                }
+
+                val itemDirectory = "/.Kyeootomi/${hitomiItem.numCollection?:0}/${hitomiItem._no}"
+                val coverDirectory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), itemDirectory)
+                val cover = File(coverDirectory, "1.webp")
+                if (cover.exists()) {
+                    fragmentHitomiBinding.wrapCoverError.visibility = View.GONE
+                    fragmentHitomiBinding.imgCover.visibility = View.VISIBLE
+                    val uri = Uri.fromFile(cover)
+                    fragmentHitomiBinding.imgCover.setImageURI(Uri.fromFile(cover))
                 }
                 binding.wrapview.addView(fragmentHitomiBinding.root)
             }

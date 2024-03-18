@@ -7,7 +7,7 @@
     <FrameLayout
         android:id="@+id/cover"
         android:layout_width="wrap_content"
-        android:layout_height="300dp"
+        android:layout_height="270dp"
         android:layout_margin="5dp">
         <ImageView
             android:id="@+id/imgCover"
@@ -18,7 +18,8 @@
             android:adjustViewBounds="true"
             android:visibility="gone"/>
         <RelativeLayout
-            android:layout_width="130dp"
+            android:id="@+id/wrapCoverError"
+            android:layout_width="160dp"
             android:layout_height="match_parent"
             android:background="@drawable/img_unloadable">
             <ImageView
@@ -43,7 +44,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="300dp"
+        android:minHeight="270dp"
         android:layout_margin="5dp">
 
         <TextView

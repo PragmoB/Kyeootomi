@@ -17,28 +17,26 @@
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:visibility="gone"/>
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/wrapCoverError"
             android:layout_width="160dp"
             android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
             android:background="@drawable/img_unloadable">
             <ImageView
                 android:id="@+id/imgError"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="100dp"
                 android:adjustViewBounds="true"
                 android:src="@drawable/ic_error"/>
             <TextView
-                android:layout_centerHorizontal="true"
-                android:layout_below="@id/imgError"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="10sp"
                 android:text="작품 이미지를\n불러올 수 없습니다"/>
-        </RelativeLayout>
+        </LinearLayout>
     </FrameLayout>
     <LinearLayout
         android:orientation="vertical"

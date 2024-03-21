@@ -67,7 +67,7 @@
                 android:onClick="@{(view) -> viewModel.setDownloaded(true)}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"/>
+                android:layout_marginEnd="20dp"/>
             <RadioButton
                 android:text="저장하지 않음"
                 android:onClick="@{(view) -> viewModel.setDownloaded(false)}"

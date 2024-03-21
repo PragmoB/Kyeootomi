@@ -91,7 +91,7 @@ class ItemAdapter(private var items : List<Item>)
         // wrapviewHeight = 펼쳐질 항목의 높이 측정 ) 사실 view.measure로 측정했었지만 (이 문제와는 별개로 표시되는 히토미 작품의 정보량이 너무 많아서 높이 300dp를 넘어 넘쳐버리는 일 때문에)
         // xml 레이아웃좀 수정했더니 맛가버림 왜그런지는 5시간정도 고민해보고 검색해보고 했는데 미스터리임.
         // 그런데 화면에 뜨는건 또 정상적으로 떠서 그냥 이거 이용하면 되겠다 싶어서 화면에 출력된 높이 구해오는 방법으로 했음
-        var wrapviewHeight : Int = 800
+        var wrapviewHeight = 800
         binding.wrapview.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 wrapviewHeight = binding.wrapview.height

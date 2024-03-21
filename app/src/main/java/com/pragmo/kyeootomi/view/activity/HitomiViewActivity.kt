@@ -64,12 +64,26 @@ class HitomiViewActivity : AppCompatActivity() {
             val manga = hitomiItem.getFile(it.toInt()) ?: return@observe
             setManga(manga)
         }
+        binding.txtCountPages.addOnLayoutChangeListener { _, left, _, right, _, _, _, _, _ ->
+            // txtNumPage의 너비를 txtCountPages의 너비에 맞추기
+            val layoutParams = binding.txtNumPage.layoutParams
+            layoutParams.width = right - left
+            binding.txtNumPage.layoutParams = layoutParams
+        }
         binding.sliderPage.addOnChangeListener { _, value, _ ->
             viewModel.numPage.value = value.toInt()
         }
         binding.imgManga.setOnPhotoTapListener { _, _, _ ->
-            viewModel.pageNext()
-            showMenu(false)
+            if (menuIsShown)
+                showMenu(false)
+            else
+                viewModel.pageNext()
+        }
+        binding.imgManga.setOnOutsidePhotoTapListener {
+            if (menuIsShown)
+                showMenu(false)
+            else
+                showMenu(true)
         }
         binding.rootMain.setOnClickListener {
             if (menuIsShown)

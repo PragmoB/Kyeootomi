@@ -25,6 +25,30 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:layout_centerInParent="true"/>
+        <LinearLayout
+            android:id="@+id/wrapCoverError"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/img_unloadable"
+            android:layout_centerInParent="true"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/imgError"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_error"
+                android:contentDescription="Manga" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="10sp"
+                android:text="작품 이미지를\n불러올 수 없습니다"/>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/wrapSlider"

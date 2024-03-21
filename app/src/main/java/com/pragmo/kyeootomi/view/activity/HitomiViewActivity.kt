@@ -3,6 +3,7 @@ package com.pragmo.kyeootomi.view.activity
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityHitomiViewBinding
 import com.pragmo.kyeootomi.viewmodel.HitomiViewViewModel
+import java.io.File
 
 class HitomiViewActivity : AppCompatActivity() {
 
@@ -28,6 +30,13 @@ class HitomiViewActivity : AppCompatActivity() {
             supportActionBar?.hide()
             binding.wrapSlider.visibility = View.GONE
         }
+    }
+    private fun setManga(manga : File) {
+        binding.imgManga.setImageURI(Uri.fromFile(manga))
+        if (binding.imgManga.drawable == null)
+            binding.wrapCoverError.visibility = View.VISIBLE
+        else
+            binding.wrapCoverError.visibility = View.GONE
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,17 +57,17 @@ class HitomiViewActivity : AppCompatActivity() {
             supportActionBar?.title = it.title
             val numPage = viewModel.numPage.value ?: return@observe
             val manga = it.getFile(numPage) ?: return@observe
-            binding.imgManga.setImageURI(Uri.fromFile(manga))
+            setManga(manga)
         }
         viewModel.numPage.observe(this) {
             val hitomiItem = viewModel.hitomiItem.value ?: return@observe
             val manga = hitomiItem.getFile(it.toInt()) ?: return@observe
-            binding.imgManga.setImageURI(Uri.fromFile(manga))
+            setManga(manga)
         }
         binding.sliderPage.addOnChangeListener { _, value, _ ->
             viewModel.numPage.value = value.toInt()
         }
-        binding.imgManga.setOnClickListener {
+        binding.imgManga.setOnPhotoTapListener { _, _, _ ->
             viewModel.pageNext()
             showMenu(false)
         }

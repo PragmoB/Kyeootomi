@@ -51,7 +51,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     fun loadItems() {
         val collection = _collection.value?:return
-        _listItem.value = itemModel.get(collection.num)
+        _listItem.value = itemModel.getByCollection(collection.num)
     }
     fun loadCollection() {
         val collection = _collection.value?:return

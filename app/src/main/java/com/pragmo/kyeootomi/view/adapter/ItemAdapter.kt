@@ -1,5 +1,6 @@
 package com.pragmo.kyeootomi.view.adapter
 
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Environment
@@ -19,6 +20,7 @@ import com.pragmo.kyeootomi.model.data.CustomItem
 import com.pragmo.kyeootomi.model.data.HitomiItem
 import com.pragmo.kyeootomi.model.data.Item
 import com.pragmo.kyeootomi.view.ToggleAnimation
+import com.pragmo.kyeootomi.view.activity.HitomiViewActivity
 import java.io.File
 
 class ItemAdapter(private var items : List<Item>)
@@ -46,7 +48,8 @@ class ItemAdapter(private var items : List<Item>)
                 val hitomiItem = item as HitomiItem
                 binding.imgIcon.setImageResource(R.drawable.ic_hitomi)
 
-                // 세부사항 페이지 설정
+                /* 세부사항 페이지 설정 */
+
                 val fragmentHitomiBinding = FragmentItemHitomiBinding.inflate(inflater, binding.root, false)
                 fragmentHitomiBinding.btnWebview.setOnClickListener {
                     Toast.makeText(binding.root.context, "히토미 보기 페이지로 넘어가야함", Toast.LENGTH_SHORT).show()
@@ -61,14 +64,15 @@ class ItemAdapter(private var items : List<Item>)
                         fragmentHitomiBinding.tags.addView(viewTag.root)
                     }
                 }
-
-                val itemDirectory = "/.Kyeootomi/${hitomiItem.numCollection?:0}/${hitomiItem._no}"
-                val coverDirectory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), itemDirectory)
-                val cover = File(coverDirectory, "1.webp")
-                if (cover.exists()) {
+                fragmentHitomiBinding.imgCover.setOnClickListener {
+                    val intentHitomiView = Intent(binding.root.context, HitomiViewActivity::class.java)
+                    intentHitomiView.putExtra("_no", hitomiItem._no)
+                    binding.root.context.startActivity(intentHitomiView)
+                }
+                val cover = hitomiItem.getFile(1)
+                if (cover != null) {
                     fragmentHitomiBinding.wrapCoverError.visibility = View.GONE
                     fragmentHitomiBinding.imgCover.visibility = View.VISIBLE
-                    val uri = Uri.fromFile(cover)
                     fragmentHitomiBinding.imgCover.setImageURI(Uri.fromFile(cover))
                 }
                 binding.wrapview.addView(fragmentHitomiBinding.root)

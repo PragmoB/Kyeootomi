@@ -6,6 +6,11 @@
     </style>
 
     <style name="Theme.Kyeootomi" parent="Base.Theme.Kyeootomi" />
+    <style name="Theme.Kyeootomi.HitomiViewer" parent="Theme.Kyeootomi">
+        <item name="colorPrimary">@android:color/black</item>
+        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
     <style name="RoundedShape">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">200dp</item> <!-- 조절하고자 하는 둥글기의 정도 -->

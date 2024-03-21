@@ -1,25 +1,28 @@
 package com.pragmo.kyeootomi.model.data
 
-class HitomiItem : Item {
+import java.io.File
 
-    var number : Int
-    var downloaded: Boolean
+class HitomiItem(
+    item: Item,
+    var number: Int,
+    var downloaded: Boolean,
+    var artist: String? = null,
+    var series: String? = null,
+    var tags: List<String>? = null
+) : Item(item) {
 
-    // 없어도 되는 선택옵션들
-    var artist : String?
-    var series : String?
-    var tags : List<String>?
 
-    constructor(item : Item,
-                number : Int,
-                downloaded: Boolean,
-                artist: String? = null,
-                series: String? = null,
-                tags: List<String>? = null) : super(item) {
-        this.number = number
-        this.downloaded = downloaded
-        this.artist = artist
-        this.series = series
-        this.tags= tags
+    val filesDir : File
+        get() {
+            val filesDir = File(Item.filesDir, "/${numCollection ?: 0}/hitomi-$_no")
+            if (!filesDir.exists())
+                filesDir.mkdirs()
+            return filesDir
+        }
+    fun getFile(order : Int) : File? {
+        val file = File(filesDir, "/$order.webp")
+        if (!file.exists())
+            return null
+        return file
     }
 }

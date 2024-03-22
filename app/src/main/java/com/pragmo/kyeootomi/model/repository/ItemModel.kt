@@ -279,7 +279,7 @@ class ItemModel(private val context : Context) {
 
             val db = ItemDBHelper(context).writableDatabase
             val values = ContentValues()
-            item.numCollection?.let {
+            item.collection.num?.let {
                 values.put("collection", it)
             } ?: values.putNull("collection")
             if (useTitle)
@@ -379,10 +379,13 @@ class ItemModel(private val context : Context) {
         if (!cursor.moveToNext())
             return null
 
+        val numCollection = if (cursor.isNull(0)) null else cursor.getInt(0)
+        val collectionModel = CollectionModel(context)
+        val collection = collectionModel.get(numCollection)!!
         val item = Item(
             "hitomi",
             numItem,
-            cursor.getInt(0),
+            collection,
             cursor.getString(1)
         )
         val hitomiItem = HitomiItem(
@@ -398,6 +401,9 @@ class ItemModel(private val context : Context) {
         return hitomiItem
     }
     fun getHitomiByCollection(numCollection : Int?) : List<HitomiItem> {
+
+        // db에서 cursor참조
+
         val db = ItemDBHelper(context).readableDatabase
         val listHitomi = mutableListOf<HitomiItem>()
         val cursor = db.query(
@@ -407,12 +413,15 @@ class ItemModel(private val context : Context) {
             if (numCollection == null) null else arrayOf(numCollection.toString()),
             null, null, null)
 
-        while (cursor.moveToNext()) {
+        // cursor를 돌며 히토미 작품 항목들을 뽑아냄
 
+        val collectionModel = CollectionModel(context)
+        while (cursor.moveToNext()) {
+            val collection = collectionModel.get(numCollection)!!
             val item = Item(
                 "hitomi",
                 cursor.getInt(0),
-                numCollection,
+                collection,
                 if (cursor.isNull(1)) null else cursor.getString(1))
 
             val hitomiItem = HitomiItem(
@@ -436,10 +445,10 @@ class ItemModel(private val context : Context) {
     fun addCustom(item : CustomItem) : Boolean {
         val db = ItemDBHelper(context).writableDatabase
         val values = ContentValues()
-        if (item.numCollection == null)
+        if (item.collection.num == null)
             values.putNull("collection")
         else
-            values.put("collection", item.numCollection)
+            values.put("collection", item.collection.num)
         values.put("title", item.title?:"auto")
         values.put("URL", item.url)
         db.insert("CustomItem", null, values)
@@ -458,7 +467,10 @@ class ItemModel(private val context : Context) {
         if (!cursor.moveToNext())
             return null
 
-        val item = Item("custom", numItem, cursor.getInt(0), cursor.getString(1))
+        val numCollection = if (cursor.isNull(0)) null else cursor.getInt(0)
+        val collectionModel = CollectionModel(context)
+        val collection = collectionModel.get(numCollection)!!
+        val item = Item("custom", numItem, collection, cursor.getString(1))
         val customItem = CustomItem(item, cursor.getString(2))
 
         cursor.close()
@@ -473,8 +485,10 @@ class ItemModel(private val context : Context) {
             if (numCollection == null) null else arrayOf(numCollection.toString()),
             null, null, null)
 
+        val collectionModel = CollectionModel(context)
         while (cursor.moveToNext()) {
-            val item = Item("custom", cursor.getInt(0), numCollection, cursor.getString(1))
+            val collection = collectionModel.get(numCollection)!!
+            val item = Item("custom", cursor.getInt(0), collection, cursor.getString(1))
             val customItem = CustomItem(item, cursor.getString(2))
             listCustom.add(customItem)
         }

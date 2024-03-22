@@ -12,6 +12,7 @@ import com.pragmo.kyeootomi.model.data.Collection
 import com.pragmo.kyeootomi.model.data.CustomItem
 import com.pragmo.kyeootomi.model.data.HitomiItem
 import com.pragmo.kyeootomi.model.data.Item
+import com.pragmo.kyeootomi.model.repository.CollectionModel
 import com.pragmo.kyeootomi.model.repository.ItemModel
 
 /* 뷰모델에서의 Context참조는 application과 AndroidViewModel을 이용한다고 함
@@ -19,13 +20,14 @@ import com.pragmo.kyeootomi.model.repository.ItemModel
 
 class AddItemViewModel(application: Application): AndroidViewModel(application) {
 
+    private val collectionModel = CollectionModel(application)
     private val itemModel = ItemModel(application)
 
-    private val _numCollection = MutableLiveData<Int>()
+    private val _collection = MutableLiveData<Collection>()
     private val _contentsProvider = MutableLiveData<String>()
     private val _title = MutableLiveData<String>()
 
-    val numCollection : LiveData<Int> = _numCollection
+    val collection : LiveData<Collection> = _collection
     val contentsProvider : LiveData<String> = _contentsProvider
     val title : LiveData<String> = _title
 
@@ -51,7 +53,7 @@ class AddItemViewModel(application: Application): AndroidViewModel(application) 
         this._useTitle.value = useTitle
     }
     fun setCollection(numCollection : Int?) {
-        this._numCollection.value = numCollection
+        this._collection.value = collectionModel.get(numCollection)
     }
     fun onTitleChanged(s : CharSequence, start : Int, before : Int, count : Int) {
         if (s.isEmpty())
@@ -82,21 +84,21 @@ class AddItemViewModel(application: Application): AndroidViewModel(application) 
         }
         when (_contentsProvider.value) {
             "hitomi" -> {
-                if (_useTitle.value?:return false)
-                    _title.value?:return false
-                val item = Item("hitomi", 0, _numCollection.value, _title.value)
+                if (_useTitle.value ?: return false)
+                    _title.value ?: return false
+                val item = Item("hitomi", 0, _collection.value ?: return false, _title.value)
                 val hitomiItem = HitomiItem(
                     item,
-                    _number.value?:return false,
-                    _downloaded.value?:return false)
-                itemModel.addHitomi(hitomiItem, _useTitle.value?:return false, onCommitComplete)
+                    _number.value ?: return false,
+                    _downloaded.value ?: return false)
+                itemModel.addHitomi(hitomiItem, _useTitle.value ?: return false, onCommitComplete)
                 return true
             }
             "custom" -> {
-                val item = Item("custom", 0, _numCollection.value, _title.value?:return false)
+                val item = Item("custom", 0, _collection.value ?: return false, _title.value ?: return false)
                 val customItem = CustomItem(
                     item,
-                    _url.value?:return false)
+                    _url.value ?: return false)
                 return itemModel.addCustom(customItem)
             }
             else -> return false

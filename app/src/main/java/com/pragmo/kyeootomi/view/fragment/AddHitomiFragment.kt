@@ -15,14 +15,14 @@ class AddHitomiFragment(private val viewModel: AddItemViewModel) : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentAddHitomiBinding.inflate(inflater, container, false)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
         viewModel.useTitle.observe(viewLifecycleOwner) {
-            if (it?:false)
+            if (it == true)
                 binding.editTitle.visibility = View.VISIBLE
             else
                 binding.editTitle.visibility = View.GONE

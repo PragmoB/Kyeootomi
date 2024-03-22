@@ -9,15 +9,16 @@ class CollectionModel(private val context : Context) {
 
     /*  numCollection번 컬렉션에 collectionName인 하위 컬렉션 생성 */
 
-    fun add(numCollection : Int?, name : String) {
+    fun add(collection: Collection) {
 
         /* DB에 등록 */
 
         val db = CollectionDBHelper(context).writableDatabase
         val values = ContentValues()
-        if (numCollection != null) values.put("collection", numCollection)
-        else values.putNull("collection")
-        values.put("name", name)
+        collection.numParentCollection?.let {
+            values.put("collection", it)
+        } ?: values.putNull("collection")
+        values.put("name", collection.name)
         db.insert("Collection", null, values)
     }
 
@@ -30,7 +31,7 @@ class CollectionModel(private val context : Context) {
                 if (numCollection == null) "collection IS NULL"
                 else "collection=?",
                 if (numCollection == null) null
-                else arrayOf(numCollection?.toString()),
+                else arrayOf(numCollection.toString()),
             null, null, null)
 
         while (cursor.moveToNext())

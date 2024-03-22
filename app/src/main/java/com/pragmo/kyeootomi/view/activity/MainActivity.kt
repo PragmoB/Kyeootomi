@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             if (it != null)
                 binding.recyclerDocument.adapter = ItemAdapter(it)
         }
-        viewModel.listCollection.observe(this) {
+        viewModel.listSubCollections.observe(this) {
 
             /* 컬렉션 메뉴 렌더링 */
 
@@ -103,6 +103,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             binding.naviView.postInvalidate()
         }
         viewModel.collection.observe(this) {
+            val txtTitle = binding.naviView.getHeaderView(0).findViewById<TextView>(R.id.txtTitle)
+            txtTitle.text = it.name
             val txtPath = binding.naviView.getHeaderView(0).findViewById<TextView>(R.id.txtPath)
             txtPath.text = viewModel.getPath().replace("/", " > ")
         }
@@ -113,7 +115,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onResume() {
         super.onResume()
         viewModel.loadItems()
-        viewModel.loadCollection()
+        viewModel.loadSubCollections()
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (toggle.onOptionsItemSelected(item))

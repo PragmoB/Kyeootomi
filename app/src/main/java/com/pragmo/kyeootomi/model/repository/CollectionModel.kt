@@ -88,28 +88,32 @@ class CollectionModel(private val context : Context) {
 
     /* numCollection번 컬렉션의 이름 name로 변경 */
 
-    fun update(numCollection : Int, name : String) {
+    fun update(collection : Collection, name : String) {
+        collection.num ?: return
+
         val db = CollectionDBHelper(context).writableDatabase
         val values = ContentValues()
         values.put("name", name)
-        db.update("Collection", values, "_no=?", arrayOf(numCollection.toString()))
+        db.update("Collection", values, "_no=?", arrayOf(collection.num.toString()))
     }
 
     /* numCollection번 컬렉션 및 하위 컬렉션, 하위 작품 삭제 */
 
-    fun delete(numCollection: Int?) {
+    fun delete(collection: Collection) {
+        // 컬렉션 디렉터리 날려버리기
+        collection.dir.deleteRecursively()
 
-        // numCollection번 컬렉션 및 numCollection번 컬렉션의 작품 삭제
-        val itemModel = ItemModel(context)
+        // numCollection번 컬렉션 및 numCollection번 컬렉션의 작품 db 데이터 삭제
         val db = CollectionDBHelper(context).writableDatabase
-        if (numCollection != null)
-            db.delete("Collection", "_no=?", arrayOf(numCollection.toString()))
-        itemModel.deleteByCollection(numCollection)
+        val itemModel = ItemModel(context)
+        if (collection.num != null)
+            db.delete("Collection", "_no=?", arrayOf(collection.num.toString()))
+        itemModel.deleteByCollection(collection.num, false)
 
         // numCollection번 컬렉션의 하위 컬렉션 모두 삭제
-        val subCollections = getSubCollections(numCollection)
+        val subCollections = getSubCollections(collection.num)
         for (subCollection in subCollections)
-            delete(subCollection.num)
+            delete(subCollection)
 
         return
     }

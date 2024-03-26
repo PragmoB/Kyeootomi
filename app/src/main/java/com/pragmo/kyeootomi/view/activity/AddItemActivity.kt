@@ -21,9 +21,9 @@ class AddItemActivity : AppCompatActivity() {
     private lateinit var binding : ActivityAddItemBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        viewModel = ViewModelProvider(this)[AddItemViewModel::class.java]
         super.onCreate(savedInstanceState)
         val numCollection = intent.getIntExtra("numCollection", 0)
+        viewModel = ViewModelProvider(this)[AddItemViewModel::class.java]
         viewModel.setCollection(if (numCollection == 0) null else numCollection)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_item)

@@ -10,9 +10,6 @@ open class Item(
     var title : String?
 ) {
 
-    companion object {
-        lateinit var filesDir : File
-    }
     constructor(item : Item) : this(item.type, item._no, item.collection, item.title) {
 
     }

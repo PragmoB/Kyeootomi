@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.FragmentAddHitomiBinding
 import com.pragmo.kyeootomi.viewmodel.AddItemViewModel
@@ -17,7 +18,7 @@ class AddHitomiFragment(private val viewModel: AddItemViewModel) : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding = FragmentAddHitomiBinding.inflate(inflater, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_hitomi, container, false)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 

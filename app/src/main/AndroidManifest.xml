@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -17,11 +17,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kyeootomi"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31">
+        tools:targetApi="31" >
+        <activity
+            android:name=".view.activity.UpdateItemActivity"
+            android:exported="false" />
         <activity
             android:name=".view.activity.HitomiViewActivity"
             android:exported="false"
-            android:theme="@style/Theme.Kyeootomi.HitomiViewer"/>
+            android:theme="@style/Theme.Kyeootomi.HitomiViewer" />
 
         <receiver
             android:name=".model.repository.DownloadReceiver"
@@ -32,7 +35,7 @@
             android:exported="false" />
         <activity
             android:name=".view.activity.MainActivity"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

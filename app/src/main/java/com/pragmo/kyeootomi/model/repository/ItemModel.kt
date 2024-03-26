@@ -3,19 +3,13 @@ package com.pragmo.kyeootomi.model.repository
 import android.app.DownloadManager
 import android.content.ContentValues
 import android.content.Context
-import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.webkit.JavascriptInterface
-import android.webkit.RenderProcessGoneDetail
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -23,11 +17,12 @@ import com.pragmo.kyeootomi.model.KyeootomiApplication
 import com.pragmo.kyeootomi.model.data.CustomItem
 import com.pragmo.kyeootomi.model.data.HitomiItem
 import com.pragmo.kyeootomi.model.data.Item
-import kotlinx.coroutines.delay
 import org.jsoup.Jsoup
 import java.io.File
 
 class ItemModel(private val context : Context) {
+
+    /* 히토미 작품 처리 */
 
     private fun downloadHitomi(number: Int, orders: MutableList<Int>, absolutePath: String) {
         if (orders.size == 0)
@@ -159,6 +154,9 @@ class ItemModel(private val context : Context) {
             }
         }, 6000)
     }
+    /*
+     * bundle values : title: String, artist: String, series: String, tags: StringArrayList
+     */
     private fun crawlHitomiInfo(number : Int, onComplete : (Bundle?) -> Unit) {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (connectivityManager.activeNetwork == null) {
@@ -221,11 +219,11 @@ class ItemModel(private val context : Context) {
                     return
 
                 val infoDoc = Jsoup.parse(html)
-                var autoTitle = bun.getString("autoTitle")?:""
+                var title = bun.getString("title")?:""
                 infoDoc?.select("#gallery-brand")?.select("a")?.text()?.let {
-                    autoTitle = it
+                    title = it
                 }
-                if (autoTitle.isEmpty()) // 크롤링 실패 여부 검사
+                if (title.isEmpty()) // 크롤링 실패 여부 검사
                     return
 
                 // 크롤링 완전 성공으로 판정
@@ -243,7 +241,7 @@ class ItemModel(private val context : Context) {
                     }
                 }
 
-                bun.putString("autoTitle", autoTitle)
+                bun.putString("title", title)
                 bun.putString("artist", artist)
                 bun.putString("series", series)
                 bun.putStringArrayList("tags", tags)
@@ -267,7 +265,7 @@ class ItemModel(private val context : Context) {
         }, 11000)
     }
 
-    fun addHitomi(item : HitomiItem, useTitle : Boolean, onComplete : (Boolean) -> Unit) {
+    fun addHitomi(hitomiValues : HitomiItem, useTitle : Boolean, onComplete : (Boolean) -> Unit) {
 
 
         val onGetInfoComplete : (Bundle?) -> Unit = onGetInfoComplete@{ bun ->
@@ -277,19 +275,18 @@ class ItemModel(private val context : Context) {
              * 코드 가독성이 훼손된 부분은 널 안전성을 위하여 어쩔 수 없었음.
              */
 
-            val db = ItemDBHelper(context).writableDatabase
             val values = ContentValues()
-            item.collection.num?.let {
+            hitomiValues.collection.num?.let {
                 values.put("collection", it)
             } ?: values.putNull("collection")
             if (useTitle)
-                values.put("title", item.title)
+                values.put("title", hitomiValues.title)
             else
                 bun?.let {
-                    values.put("title", it.getString("autoTitle"))
+                    values.put("title", it.getString("title"))
                 } ?: values.putNull("title")
-            values.put("number", item.number)
-            values.put("downloaded", item.downloaded)
+            values.put("number", hitomiValues.number)
+            values.put("downloaded", hitomiValues.downloaded)
             bun?.let {
                 values.put("artist", it.getString("artist"))
                 values.put("series", it.getString("series"))
@@ -309,6 +306,7 @@ class ItemModel(private val context : Context) {
                 values.put("tags", concatenates)
             }
 
+            val db = ItemDBHelper(context).writableDatabase
             db.insert("HitomiItem", null, values)
             onComplete.invoke(true)
 
@@ -320,7 +318,7 @@ class ItemModel(private val context : Context) {
             val cursor = db.query("HitomiItem", arrayOf("_no"),
                 null, null, null, null, "_no DESC")
             cursor.moveToNext()
-            item._no = cursor.getInt(0)
+            hitomiValues._no = cursor.getInt(0)
             cursor.close()
 
             /* 여기서부터는 작품 표지 이미지파일 다운로드 */
@@ -352,20 +350,20 @@ class ItemModel(private val context : Context) {
              * 그냥 여기에 몇줄만 추가하면 되니까 아주 쉽고 간편하다.
              * => 시간이 별 차이가 없다. 그냥 단일로 감
              * */
-            if (item.downloaded) {
+            if (hitomiValues.downloaded) {
                 val count = bun.getInt("count")
                 count.let {
                     Handler(Looper.getMainLooper()).post {
-                        downloadHitomi(item.number, (1..it).toMutableList(), item.filesDir.absolutePath)
+                        downloadHitomi(hitomiValues.number, (1..it).toMutableList(), hitomiValues.filesDir.absolutePath)
                     }
                 }
             }
             else
                 Handler(Looper.getMainLooper()).post {
-                    downloadHitomi(item.number, mutableListOf(1), item.filesDir.absolutePath)
+                    downloadHitomi(hitomiValues.number, mutableListOf(1), hitomiValues.filesDir.absolutePath)
                 }
         }
-        crawlHitomiInfo(item.number, onGetInfoComplete)
+        crawlHitomiInfo(hitomiValues.number, onGetInfoComplete)
     }
     fun getHitomi(numItem: Int) : HitomiItem? {
         val db = ItemDBHelper(context).readableDatabase
@@ -437,10 +435,91 @@ class ItemModel(private val context : Context) {
         cursor.close()
         return listHitomi
     }
-    fun deleteHitomi(numItem: Int) {
-        val db = ItemDBHelper(context).writableDatabase
-        db.delete("HitomiItem", "_no=?", arrayOf(numItem.toString()))
+    fun updateHitomi(numItem : Int, hitomiValues: HitomiItem,
+                     useTitle: Boolean, reloadInfo: Boolean,
+                     useDownloadOpt: Boolean, onComplete: (Boolean) -> Unit) {
+
+        val onGetInfoComplete : (Bundle?) -> Unit = onGetInfoComplete@{ bun ->
+            val values = ContentValues()
+            hitomiValues.collection.num?.let {
+                values.put("collection", it)
+            }
+            if (useTitle)
+                values.put("title", hitomiValues.title)
+            else
+                bun?.let {
+                    values.put("title", it.getString("title"))
+                }
+            values.put("number", hitomiValues.number)
+            if (useDownloadOpt)
+                values.put("downloaded", hitomiValues.downloaded)
+            if (reloadInfo) {
+                bun?.let {
+                    values.put("artist", it.getString("artist"))
+                    values.put("series", it.getString("series"))
+                }
+                var concatenates = ""
+                bun?.getStringArrayList("tags")?.let {
+                    for (tag in it)
+                        concatenates += "$tag|"
+                }
+                if (concatenates.isNotEmpty()) {
+                    concatenates = concatenates.substring(0, concatenates.length - 1)
+                    values.put("tags", concatenates)
+                }
+            }
+
+            val db = ItemDBHelper(context).writableDatabase
+            db.update("HitomiItem", values, "_no=?", arrayOf(numItem.toString()))
+            onComplete(true)
+
+            if (bun == null)
+                return@onGetInfoComplete
+
+            if (useDownloadOpt && hitomiValues.downloaded)
+                Handler(Looper.getMainLooper()).post {
+                    downloadHitomi(
+                        hitomiValues.number,
+                        (1 .. bun.getInt("count")).toMutableList(),
+                        hitomiValues.filesDir.absolutePath)
+                }
+            else if (hitomiValues.getFile(1) == null && reloadInfo)
+                Handler(Looper.getMainLooper()).post {
+                    downloadHitomi(hitomiValues.number, mutableListOf(1), hitomiValues.filesDir.absolutePath)
+                }
+        }
+
+        // 작품 파일 삭제 관련 처리
+        if (useDownloadOpt && hitomiValues.downloaded) // 작품 파일 다시 받기 옵션
+            hitomiValues.filesDir.deleteRecursively()
+        else if (useDownloadOpt) // 작품 파일 삭제 옵션
+            hitomiValues.getFile(1)?.let { coverFile ->
+
+            // 커버 이미지(1.webp) 빼고 작품 파일 삭제
+            val coverFileName = coverFile.absolutePath.split("/").let {
+                it[it.size - 1]
+            }
+            val coverFileTemp = File(hitomiValues.collection.dir, "1.tmp")
+            coverFile.renameTo(coverFileTemp)
+            hitomiValues.filesDir.deleteRecursively()
+            File(hitomiValues.filesDir, coverFileName).let { coverFileTemp.renameTo(it) }
+        } ?: run { hitomiValues.filesDir.deleteRecursively() }
+
+        // 크롤링 필요 여부 판단
+        if (reloadInfo || (useDownloadOpt && hitomiValues.downloaded) || !useTitle) // 작품 정보 다시받기 또는 파일 다시받기 또는 제목 자동설정 시 크롤링 필요
+            crawlHitomiInfo(hitomiValues.number, onGetInfoComplete)
+        else
+            onGetInfoComplete(null)
+
     }
+    fun deleteHitomi(hitomiItem: HitomiItem) {
+        hitomiItem.filesDir.deleteRecursively()
+
+        val db = ItemDBHelper(context).writableDatabase
+        db.delete("HitomiItem", "_no=?", arrayOf(hitomiItem.number.toString()))
+    }
+
+    /* 커스텀 항목 처리 */
 
     fun addCustom(item : CustomItem) : Boolean {
         val db = ItemDBHelper(context).writableDatabase
@@ -496,15 +575,48 @@ class ItemModel(private val context : Context) {
         cursor.close()
         return listCustom
     }
-    fun deleteCustom(numItem: Int) {
+    fun updateCustom(numItem : Int, customValues: CustomItem) {
+        val values = ContentValues()
+        values.put("collection", customValues.collection.num)
+        values.put("title", customValues.title)
+        values.put("URL", customValues.url)
+
         val db = ItemDBHelper(context).writableDatabase
-        db.delete("CustomItem", "_no=?", arrayOf(numItem.toString()))
+        db.update("CustomItem", values, "_no=?", arrayOf(numItem.toString()))
+    }
+    fun deleteCustom(customItem: CustomItem) {
+        val db = ItemDBHelper(context).writableDatabase
+        db.delete("CustomItem", "_no=?", arrayOf(customItem._no.toString()))
     }
 
+    /* 공통 */
+
+
+    fun get(itemType: String, numItem: Int) : Item? = when (itemType) {
+        "hitomi" -> getHitomi(numItem)
+        "custom" -> getCustom(numItem)
+        else -> null
+    }
+    fun delete(itemType: String, item: Item) = when(itemType) {
+        "hitomi" -> deleteHitomi(item as? HitomiItem ?: null!!)
+        "custom" -> deleteCustom(item as? CustomItem ?: null!!)
+        else -> { }
+    }
     fun getByCollection(numCollection: Int?): List<Item> {
         return getHitomiByCollection(numCollection) + getCustomByCollection(numCollection)
     }
-    fun deleteByCollection(numCollection: Int?) {
+    fun deleteByCollection(numCollection: Int?, deleteFiles : Boolean = true) {
+        if (deleteFiles) {
+            val items = getByCollection(numCollection)
+            for (item in items) {
+                when (item.type) {
+                    "hitomi" -> {
+                        val hitomiItem = item as HitomiItem
+                        hitomiItem.filesDir.deleteRecursively()
+                    }
+                }
+            }
+        }
         val db = ItemDBHelper(context).writableDatabase
         db.delete("HitomiItem",
             if (numCollection == null) "collection IS NULL" else "collection=?",

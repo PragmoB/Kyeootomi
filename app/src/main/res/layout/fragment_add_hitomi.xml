@@ -36,10 +36,13 @@
         <EditText
             android:id="@+id/editTitle"
             android:onTextChanged="@{viewModel::onTitleChanged}"
+            android:inputType="text"
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="작품 이름"/>
+            android:minHeight="48dp"
+            android:hint="작품 이름"
+            android:importantForAutofill="no"/>
 
         <TextView
             android:layout_width="match_parent"

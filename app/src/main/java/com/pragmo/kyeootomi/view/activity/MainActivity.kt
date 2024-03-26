@@ -1,45 +1,55 @@
 package com.pragmo.kyeootomi.view.activity
 
-import android.Manifest
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
-import android.provider.MediaStore
-import android.util.DisplayMetrics
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityMainBinding
 import com.pragmo.kyeootomi.databinding.DialogFormCollectionBinding
 import com.pragmo.kyeootomi.view.adapter.ItemAdapter
 import com.pragmo.kyeootomi.viewmodel.MainViewModel
-import java.util.concurrent.Executor
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var viewModel : MainViewModel
     private lateinit var binding : ActivityMainBinding
+    private lateinit var menu: Menu
     private lateinit var toggle : ActionBarDrawerToggle
 
+    private fun setSelectMode(selectMode: Boolean) {
+        val itemAdapter = binding.recyclerDocument.adapter as ItemAdapter
+
+        if (selectMode) {
+            itemAdapter.selectMode = true
+            if (!menu.hasVisibleItems() && ::menu.isInitialized)
+                menuInflater.inflate(R.menu.menu_main_item_select, menu)
+            binding.btnAddItem.visibility = View.GONE
+            binding.refreshDocument.isEnabled = false
+        } else {
+            if (::menu.isInitialized)
+                menu.clear()
+            itemAdapter.selectMode = false
+            binding.btnAddItem.visibility = View.VISIBLE
+            binding.refreshDocument.isEnabled = true
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.setCollection(null)
@@ -82,12 +92,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             startActivity(intentAddItem)
         }
         binding.naviView.setNavigationItemSelectedListener(this)
+        val backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val itemAdapter = binding.recyclerDocument.adapter as ItemAdapter
+                if (itemAdapter.selectMode) {
+                    setSelectMode(false)
+                } else
+                    finish()
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
+        val onLongClickItemListener: (ItemAdapter) -> Unit = { // 작품 길게 누를때
+            setSelectMode(true)
+        }
         viewModel.listItem.observe(this) {
 
             /* 작품 리스트 렌더링 */
 
             if (it != null)
-                binding.recyclerDocument.adapter = ItemAdapter(it)
+                binding.recyclerDocument.adapter = ItemAdapter(it, onLongClickItemListener)
+
+            setSelectMode(false)
         }
         viewModel.listSubCollections.observe(this) {
 
@@ -109,19 +134,49 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             txtPath.text = viewModel.getPath().replace("/", " > ")
         }
 
-    }
-
-
-    override fun onResume() {
-        super.onResume()
         viewModel.loadItems()
         viewModel.loadSubCollections()
     }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (toggle.onOptionsItemSelected(item))
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        this.menu = menu
+        return super.onCreateOptionsMenu(menu)
+    }
+    private val onUpdateItemResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        val intentResult = it.data ?: return@registerForActivityResult
+        // '완료'버튼 클릭으로 끝났다면
+        if (intentResult.getStringExtra("result") == "complete")
+            setSelectMode(false)
+    }
+    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
+        if (toggle.onOptionsItemSelected(menuItem))
             return true
 
-        return super.onOptionsItemSelected(item)
+        // 선택된 작품 항목의 인덱스 값들을 selectedItemIndex에 추출
+        val listItemValue = viewModel.listItem.value ?: return false
+        val selectedItemIndex = mutableListOf<Int>()
+        val itemAdapter = binding.recyclerDocument.adapter as ItemAdapter
+        for (i in listItemValue.indices) {
+            if (itemAdapter.getItemChecked(i))
+                selectedItemIndex.add(i)
+        }
+        when(menuItem.itemId) {
+            R.id.menuUpdateItem -> { // 작품 업데이트
+                // 업데이트할 작품은 하나여야 함
+                if (selectedItemIndex.size != 1) {
+                    Toast.makeText(this, "하나만 선택해주세요", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+
+                // 데이터 셋팅 후 업데이트 액티비티 시작
+                val item = listItemValue[selectedItemIndex[0]]
+                val intentUpdateItem = Intent(this, UpdateItemActivity::class.java)
+                intentUpdateItem.putExtra("numItem", item._no)
+                intentUpdateItem.putExtra("itemType", item.type)
+                onUpdateItemResultLauncher.launch(intentUpdateItem)
+            }
+        }
+        return super.onOptionsItemSelected(menuItem)
     }
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val formCollectionBinding = DialogFormCollectionBinding.inflate(layoutInflater)

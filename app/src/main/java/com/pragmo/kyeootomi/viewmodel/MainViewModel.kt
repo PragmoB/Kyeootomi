@@ -38,15 +38,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val collectionValue = _collection.value ?: return@OnClickListener
         val formCollectionNameValue = _formCollectionName.value ?: return@OnClickListener
 
-        collectionValue.num?.let { // 최상위 컬렉션은 이름 변경 불가능
-            collectionModel.update(it, formCollectionNameValue)
+        if (collectionValue.num != null) { // 최상위 컬렉션은 이름 변경 불가능
+            collectionModel.update(collectionValue, formCollectionNameValue)
             Toast.makeText(application, "변경되었습니다", Toast.LENGTH_SHORT).show()
         }
     }
     val deleteCollectionListener = DialogInterface.OnClickListener { _, _ ->
         val collectionValue = _collection.value ?: return@OnClickListener
 
-        collectionModel.delete(collectionValue.num)
+        collectionModel.delete(collectionValue)
         revertCollection()
     }
 

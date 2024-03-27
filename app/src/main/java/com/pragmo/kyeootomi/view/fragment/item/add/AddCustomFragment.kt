@@ -1,4 +1,4 @@
-package com.pragmo.kyeootomi.view.fragment
+package com.pragmo.kyeootomi.view.fragment.item.add
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,11 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.pragmo.kyeootomi.R
-import com.pragmo.kyeootomi.databinding.FragmentUpdateHitomiBinding
-import com.pragmo.kyeootomi.viewmodel.UpdateHitomiItemViewModel
+import com.pragmo.kyeootomi.databinding.FragmentAddCustomBinding
+import com.pragmo.kyeootomi.viewmodel.item.add.AddCustomViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -22,12 +20,13 @@ import com.pragmo.kyeootomi.viewmodel.UpdateHitomiItemViewModel
  * Use the [UpdateHitomiFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class UpdateHitomiFragment : Fragment() {
-    private lateinit var binding: FragmentUpdateHitomiBinding
+class AddCustomFragment() : Fragment() {
 
-    private val viewModel: UpdateHitomiItemViewModel by activityViewModels()
+    private lateinit var binding : FragmentAddCustomBinding
+    private val viewModel: AddCustomViewModel by activityViewModels()
+
     // TODO: Rename and change types of parameters
-   //private var param1: String? = null
+    //private var param1: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,32 +34,16 @@ class UpdateHitomiFragment : Fragment() {
             //param1 = it.getString(ARG_PARAM1)
         }
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_update_hitomi, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_custom, container, false)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
-
-        viewModel.titleOpt.observe(viewLifecycleOwner) {
-            when (it) {
-                R.id.radioSetAutoTitle -> {
-                    viewModel.reloadInfo.value = true
-                    binding.checkReloadInfo.isEnabled = false
-                    binding.editTitle.visibility = View.GONE
-                }
-                else -> {
-                    binding.checkReloadInfo.isEnabled = true
-                    binding.editTitle.visibility = View.VISIBLE
-                }
-            }
-        }
         return binding.root
     }
-
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -74,7 +57,7 @@ class UpdateHitomiFragment : Fragment() {
         @JvmStatic
         fun newInstance(//param1: String
         ) =
-            UpdateHitomiFragment().apply {
+            AddCustomFragment().apply {
                 arguments = Bundle().apply {
                     //putString(ARG_PARAM1, param1)
                 }

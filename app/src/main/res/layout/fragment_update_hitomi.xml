@@ -4,7 +4,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.pragmo.kyeootomi.viewmodel.UpdateHitomiItemViewModel"/>
+            type="com.pragmo.kyeootomi.viewmodel.item.update.UpdateHitomiViewModel"/>
     </data>
 
     <LinearLayout

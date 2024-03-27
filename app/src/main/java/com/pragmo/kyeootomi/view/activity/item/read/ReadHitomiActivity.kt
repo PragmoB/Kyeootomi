@@ -1,9 +1,8 @@
-package com.pragmo.kyeootomi.view.activity
+package com.pragmo.kyeootomi.view.activity.item.read
 
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -11,14 +10,14 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pragmo.kyeootomi.R
-import com.pragmo.kyeootomi.databinding.ActivityHitomiViewBinding
-import com.pragmo.kyeootomi.viewmodel.HitomiViewViewModel
+import com.pragmo.kyeootomi.databinding.ActivityReadHitomiBinding
+import com.pragmo.kyeootomi.viewmodel.item.read.ReadHitomiViewModel
 import java.io.File
 
-class HitomiViewActivity : AppCompatActivity() {
+class ReadHitomiActivity : AppCompatActivity() {
 
-    private lateinit var viewModel : HitomiViewViewModel
-    private lateinit var binding : ActivityHitomiViewBinding
+    private lateinit var viewModel : ReadHitomiViewModel
+    private lateinit var binding : ActivityReadHitomiBinding
     private var menuIsShown = true
 
     private fun showMenu(show : Boolean) {
@@ -40,8 +39,8 @@ class HitomiViewActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this)[HitomiViewViewModel::class.java]
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_hitomi_view)
+        viewModel = ViewModelProvider(this)[ReadHitomiViewModel::class.java]
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_read_hitomi)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         setContentView(binding.root)

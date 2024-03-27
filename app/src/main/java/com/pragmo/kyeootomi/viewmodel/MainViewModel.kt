@@ -18,59 +18,54 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _listItem = MutableLiveData<List<Item>>()
     private val _listSubCollections = MutableLiveData<List<Collection>>()
     private val _collection = MutableLiveData<Collection>()
-    private val _formCollectionName = MutableLiveData<String>()
 
     val listItem : LiveData<List<Item>> = _listItem
     val listSubCollections : LiveData<List<Collection>> = _listSubCollections
     val collection : LiveData<Collection> = _collection
-    val formCollectionName : LiveData<String> = _formCollectionName
 
-    val addCollectionListener = DialogInterface.OnClickListener { _, _ ->
-        val collectionValue = _collection.value ?: return@OnClickListener
-        val formCollectionNameValue = _formCollectionName.value ?: return@OnClickListener
+    val formCollectionName = MutableLiveData<String>()
+
+    fun addCollection(): Boolean {
+        val collectionValue = _collection.value ?: return false
+        val formCollectionNameValue = formCollectionName.value ?: return false
 
         val subCollection = Collection(0, collectionValue.num, formCollectionNameValue)
         collectionModel.add(subCollection)
-        loadSubCollections()
-        Toast.makeText(application, "추가되었습니다", Toast.LENGTH_SHORT).show()
+        return true
     }
-    val updateCollectionListener = DialogInterface.OnClickListener { _, _ ->
-        val collectionValue = _collection.value ?: return@OnClickListener
-        val formCollectionNameValue = _formCollectionName.value ?: return@OnClickListener
-
-        if (collectionValue.num != null) { // 최상위 컬렉션은 이름 변경 불가능
-            collectionModel.update(collectionValue, formCollectionNameValue)
-            Toast.makeText(application, "변경되었습니다", Toast.LENGTH_SHORT).show()
-        }
+    fun loadSubCollections() {
+        val collectionValue = _collection.value ?: return
+        _listSubCollections.value = collectionModel.getSubCollections(collectionValue.num)
     }
-    val deleteCollectionListener = DialogInterface.OnClickListener { _, _ ->
-        val collectionValue = _collection.value ?: return@OnClickListener
+    fun updateCollection(): Boolean {
+        val collectionValue = _collection.value ?: return false
+        val formCollectionNameValue = formCollectionName.value ?: return false
 
+        if (collectionValue.num == null) // 최상위 컬렉션은 이름 변경 불가능
+            return false
+
+        collectionModel.update(collectionValue, formCollectionNameValue)
+        return true
+    }
+    fun deleteCollection() {
+        val collectionValue = _collection.value ?: return
         collectionModel.delete(collectionValue)
-        revertCollection()
     }
 
-    fun onFormCollectionNameChanged(s : CharSequence, start : Int, before : Int, count : Int) {
-        _formCollectionName.value = s.toString()
-    }
     fun loadItems() {
         val collectionValue = _collection.value?:return
         _listItem.value = itemModel.getByCollection(collectionValue.num)
-    }
-    fun loadSubCollections() {
-        val collectionValue = _collection.value?:return
-        _listSubCollections.value = collectionModel.getSubCollections(collectionValue.num)
     }
     fun setCollection(numCollection: Int?) {
         _collection.value = collectionModel.get(numCollection)
         loadItems()
         loadSubCollections()
     }
-    fun getPath() : String {
-        return collectionModel.getPath(_collection.value?.num)
-    }
     fun revertCollection() {
         val collectionValue = _collection.value?:return
         setCollection(collectionValue.numParentCollection)
+    }
+    fun getPath() : String {
+        return collectionModel.getPath(_collection.value?.num)
     }
 }

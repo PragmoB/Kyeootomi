@@ -1,6 +1,7 @@
 package com.pragmo.kyeootomi.view.activity
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -23,6 +24,8 @@ import com.google.android.material.navigation.NavigationView
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityMainBinding
 import com.pragmo.kyeootomi.databinding.DialogFormCollectionBinding
+import com.pragmo.kyeootomi.view.activity.item.AddItemActivity
+import com.pragmo.kyeootomi.view.activity.item.UpdateItemActivity
 import com.pragmo.kyeootomi.view.adapter.ItemAdapter
 import com.pragmo.kyeootomi.viewmodel.MainViewModel
 
@@ -183,6 +186,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         formCollectionBinding.lifecycleOwner = this
         formCollectionBinding.viewModel = viewModel
 
+        val collectionValue = viewModel.collection.value ?: return false
+
         val dlg = AlertDialog.Builder(this)
         dlg.setNegativeButton("취소", null)
 
@@ -204,21 +209,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 dlg.setView(formCollectionBinding.root)
                 dlg.setTitle("컬렉션 추가")
-                dlg.setPositiveButton("확인", viewModel.addCollectionListener)
+                dlg.setPositiveButton("확인") { _, _ ->
+                    if (viewModel.addCollection()) {
+                        viewModel.loadSubCollections()
+                        Toast.makeText(application, "추가되었습니다", Toast.LENGTH_SHORT).show()
+                    }
+                }
                 dlg.show()
             }
             R.id.menuUpdateCollection -> {
-                val nowCollectionName = viewModel.collection.value!!.name
 
                 // 루트 컬렉션은 이름 변경 불가능
-                if (viewModel.collection.value!!.num == null) {
+                if (collectionValue.num == null) {
                     Toast.makeText(this, "내 컬렉션은 이름 변경이 불가능합니다", Toast.LENGTH_SHORT).show()
                     return false
                 }
 
                 // 컬렉션 입력 편의기능 세팅
-                formCollectionBinding.editCollectionName.setText(nowCollectionName)
-                formCollectionBinding.editCollectionName.requestFocus(nowCollectionName.length)
+                formCollectionBinding.editCollectionName.setText(collectionValue.name)
+                formCollectionBinding.editCollectionName.requestFocus(collectionValue.name.length)
                 formCollectionBinding.editCollectionName.postDelayed({
                     val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.showSoftInput(formCollectionBinding.editCollectionName, InputMethodManager.SHOW_IMPLICIT)
@@ -226,13 +235,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 dlg.setView(formCollectionBinding.root)
                 dlg.setTitle("컬렉션 이름 변경")
-                dlg.setPositiveButton("확인", viewModel.updateCollectionListener)
+                dlg.setPositiveButton("확인") { _, _ ->
+                    if (viewModel.updateCollection())
+                        Toast.makeText(this, "변경되었습니다", Toast.LENGTH_SHORT).show()
+                }
                 dlg.show()
             }
             R.id.menuDeleteCollection -> {
                 dlg.setTitle("컬렉션 삭제")
-                dlg.setMessage("남아있는 작품 및\n하위 컬렉션이 모두 삭제됩니다.\n${viewModel.collection.value!!.name} 을(를) 삭제하시겠습니까?")
-                dlg.setPositiveButton("확인", viewModel.deleteCollectionListener)
+                dlg.setMessage("남아있는 작품 및\n하위 컬렉션이 모두 삭제됩니다.\n${collectionValue.name} 을(를) 삭제하시겠습니까?")
+                dlg.setPositiveButton("확인") { _, _ ->
+                    viewModel.deleteCollection()
+                    viewModel.revertCollection()
+                }
                 dlg.show()
             }
 

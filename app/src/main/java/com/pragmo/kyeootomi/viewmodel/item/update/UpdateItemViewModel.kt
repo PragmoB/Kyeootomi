@@ -1,4 +1,4 @@
-package com.pragmo.kyeootomi.viewmodel
+package com.pragmo.kyeootomi.viewmodel.item.update
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -14,5 +14,5 @@ abstract class UpdateItemViewModel(application: Application) : AndroidViewModel(
     val title = MutableLiveData<String>()
 
     abstract fun setItem(numItem : Int)
-    abstract fun commit() : Boolean
+    abstract fun commit(onComplete: (Boolean) -> Unit) : Boolean
 }

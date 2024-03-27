@@ -4,7 +4,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.pragmo.kyeootomi.viewmodel.AddItemViewModel"/>
+            type="com.pragmo.kyeootomi.viewmodel.item.add.AddHitomiViewModel"/>
     </data>
 
     <LinearLayout
@@ -19,15 +19,16 @@
         <RadioGroup
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:checkedButton="@={viewModel.titleOpt}">
             <RadioButton
-                android:onClick="@{(view) -> viewModel.setUseTitle(false)}"
+                android:id="@+id/radioSetAutoTitle"
                 android:text="자동 설정"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"/>
+                android:layout_marginEnd="20dp"/>
             <RadioButton
-                android:onClick="@{(view) -> viewModel.setUseTitle(true)}"
+                android:id="@+id/radioSetCustomTitle"
                 android:text="사용자 지정"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -35,7 +36,7 @@
 
         <EditText
             android:id="@+id/editTitle"
-            android:onTextChanged="@{viewModel::onTitleChanged}"
+            android:text="@={viewModel.title}"
             android:inputType="text"
             android:visibility="gone"
             android:layout_width="match_parent"
@@ -50,10 +51,11 @@
             android:text="작품 번호"
             android:layout_marginTop="20dp"/>
         <EditText
-            android:onTextChanged="@{viewModel::onNumberChanged}"
+            android:text="@={viewModel.number}"
             android:inputType="number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:hint="123456"/>
 
         <TextView
@@ -64,16 +66,17 @@
         <RadioGroup
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:checkedButton="@={viewModel.downloadOpt}">
             <RadioButton
+                android:id="@+id/radioLocalDownload"
                 android:text="로컬에 저장"
-                android:onClick="@{(view) -> viewModel.setDownloaded(true)}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"/>
             <RadioButton
+                android:id="@+id/radioNoDownload"
                 android:text="저장하지 않음"
-                android:onClick="@{(view) -> viewModel.setDownloaded(false)}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </RadioGroup>

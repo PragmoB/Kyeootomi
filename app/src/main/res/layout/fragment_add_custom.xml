@@ -3,7 +3,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.pragmo.kyeootomi.viewmodel.AddItemViewModel"/>
+            type="com.pragmo.kyeootomi.viewmodel.item.add.AddCustomViewModel"/>
     </data>
     <LinearLayout
         android:orientation="vertical"
@@ -16,9 +16,10 @@
             android:text="제목"/>
         <EditText
             android:id="@+id/editTitle"
-            android:onTextChanged="@{viewModel::onTitleChanged}"
+            android:text="@={viewModel.title}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:hint="작품 이름"/>
 
         <TextView
@@ -28,9 +29,10 @@
             android:text="URL"/>
         <EditText
             android:id="@+id/editURL"
-            android:onTextChanged="@{viewModel::onUrlChanged}"
+            android:text="@={viewModel.url}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:hint="https://google.com"/>
 
 

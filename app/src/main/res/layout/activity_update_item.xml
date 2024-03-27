@@ -3,7 +3,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.pragmo.kyeootomi.viewmodel.UpdateItemViewModel"/>
+            type="com.pragmo.kyeootomi.viewmodel.item.update.UpdateItemViewModel"/>
     </data>
     <LinearLayout
         android:orientation="vertical"

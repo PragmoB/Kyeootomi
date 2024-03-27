@@ -1,22 +1,16 @@
 package com.pragmo.kyeootomi.view.adapter
 
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
-import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
-import androidx.recyclerview.widget.DiffUtil.DiffResult
 import androidx.recyclerview.widget.RecyclerView
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.FragmentItemCustomBinding
@@ -27,9 +21,7 @@ import com.pragmo.kyeootomi.model.data.CustomItem
 import com.pragmo.kyeootomi.model.data.HitomiItem
 import com.pragmo.kyeootomi.model.data.Item
 import com.pragmo.kyeootomi.view.ToggleAnimation
-import com.pragmo.kyeootomi.view.activity.HitomiViewActivity
-import kotlinx.coroutines.selects.select
-import java.io.File
+import com.pragmo.kyeootomi.view.activity.item.read.ReadHitomiActivity
 
 class ItemAdapter(private var items : List<Item>, private val onLongClickItemListener: (ItemAdapter) -> Unit)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -116,7 +108,7 @@ class ItemAdapter(private var items : List<Item>, private val onLongClickItemLis
                     }
                 }
                 fragmentHitomiBinding.imgCover.setOnClickListener {
-                    val intentHitomiView = Intent(binding.root.context, HitomiViewActivity::class.java)
+                    val intentHitomiView = Intent(binding.root.context, ReadHitomiActivity::class.java)
                     intentHitomiView.putExtra("_no", hitomiItem._no)
                     binding.root.context.startActivity(intentHitomiView)
                 }

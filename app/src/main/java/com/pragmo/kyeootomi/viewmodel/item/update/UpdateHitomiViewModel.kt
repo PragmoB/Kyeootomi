@@ -1,16 +1,14 @@
-package com.pragmo.kyeootomi.viewmodel
+package com.pragmo.kyeootomi.viewmodel.item.update
 
 import android.app.Application
 import android.widget.Toast
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.model.data.HitomiItem
 import com.pragmo.kyeootomi.model.data.Item
-import com.pragmo.kyeootomi.model.repository.ItemModel
 
-class UpdateHitomiItemViewModel(application: Application) : UpdateItemViewModel(application) {
+class UpdateHitomiViewModel(application: Application) : UpdateItemViewModel(application) {
 
     /* RadioGroup databinding은 RadioButton ID로 하는데 그것도 모르고 enum class 정의해서 쓰다가 버그걸렸다.
      * 지능 수준봐라..
@@ -36,23 +34,26 @@ class UpdateHitomiItemViewModel(application: Application) : UpdateItemViewModel(
         number.value = hitomiItemValue.number
     }
 
-    override fun commit() : Boolean {
+    override fun commit(onComplete: (Boolean) -> Unit) : Boolean {
         val hitomiItemValue = _hitomiItem.value ?: return false
         val titleOptValue = titleOpt.value ?: return false
-        val titleValue = if (titleOptValue == R.id.radioSetAutoTitle)
-            ""
-        else
+        if (titleOptValue == 0)
+            return false
+        val useTitle = titleOptValue == R.id.radioSetCustomTitle
+        val titleValue = if (useTitle)
             title.value ?: return false
+        else
+            "..."
+        if (titleValue.isEmpty())
+            return false
         val reloadInfoValue = reloadInfo.value ?: return false
         val downloadOptValue = downloadOpt.value ?: return false
+        if (downloadOptValue == 0)
+            return false
 
         val itemValues = Item(Item.ItemType.HITOMI, hitomiItemValue._no, hitomiItemValue.collection, titleValue)
         val hitomiValues = HitomiItem(itemValues, hitomiItemValue.number, downloadOptValue == R.id.radioRetryDownload)
-        val onComplete: (Boolean) -> Unit = { isSucceed ->
-            if (isSucceed)
-                Toast.makeText(getApplication(), "변경되었습니다", Toast.LENGTH_SHORT).show()
-        }
-        itemModel.updateHitomi(hitomiItemValue._no, hitomiValues, titleOptValue == R.id.radioSetCustomTitle,
+        itemModel.updateHitomi(hitomiItemValue._no, hitomiValues, useTitle,
             reloadInfoValue, downloadOptValue != R.id.radioNoActionDownload, onComplete)
 
         return true

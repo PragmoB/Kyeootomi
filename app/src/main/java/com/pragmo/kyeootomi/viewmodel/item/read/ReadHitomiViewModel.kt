@@ -1,16 +1,13 @@
-package com.pragmo.kyeootomi.viewmodel
+package com.pragmo.kyeootomi.viewmodel.item.read
 
 import android.app.Application
-import android.os.Environment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.android.material.slider.Slider
 import com.pragmo.kyeootomi.model.data.HitomiItem
 import com.pragmo.kyeootomi.model.repository.ItemModel
-import java.io.File
 
-class HitomiViewViewModel(application: Application) : AndroidViewModel(application) {
+class ReadHitomiViewModel(application: Application) : AndroidViewModel(application) {
     private val itemModel = ItemModel(application)
 
     private val _hitomiItem = MutableLiveData<HitomiItem>()

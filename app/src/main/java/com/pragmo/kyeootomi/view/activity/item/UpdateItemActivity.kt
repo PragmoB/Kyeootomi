@@ -1,4 +1,4 @@
-package com.pragmo.kyeootomi.view.activity
+package com.pragmo.kyeootomi.view.activity.item
 
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -11,10 +11,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityUpdateItemBinding
 import com.pragmo.kyeootomi.model.data.Item
-import com.pragmo.kyeootomi.view.fragment.UpdateHitomiFragment
-import com.pragmo.kyeootomi.viewmodel.AddItemViewModel
-import com.pragmo.kyeootomi.viewmodel.UpdateHitomiItemViewModel
-import com.pragmo.kyeootomi.viewmodel.UpdateItemViewModel
+import com.pragmo.kyeootomi.view.fragment.item.update.UpdateHitomiFragment
+import com.pragmo.kyeootomi.viewmodel.item.update.UpdateHitomiViewModel
+import com.pragmo.kyeootomi.viewmodel.item.update.UpdateItemViewModel
 
 class UpdateItemActivity : AppCompatActivity() {
     private lateinit var binding : ActivityUpdateItemBinding
@@ -22,6 +21,9 @@ class UpdateItemActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        /* 넘어온 데이터 받아내기 */
+
         val itemType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("itemType", Item.ItemType::class.java) ?: return
         } else {
@@ -30,9 +32,9 @@ class UpdateItemActivity : AppCompatActivity() {
         val numItem = intent.getIntExtra("numItem", -1)
         if (numItem == -1)
             return
-
+        //
         viewModel = when (itemType) {
-            Item.ItemType.HITOMI -> ViewModelProvider(this)[UpdateHitomiItemViewModel::class.java]
+            Item.ItemType.HITOMI -> ViewModelProvider(this)[UpdateHitomiViewModel::class.java]
             else -> null!!
         }
         val fragment = when (itemType) {
@@ -42,10 +44,14 @@ class UpdateItemActivity : AppCompatActivity() {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentUpdateInput, fragment).commit()
 
+        /* 바인딩 설정 */
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_update_item)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         setContentView(binding.root)
+
+        /* 툴바 설정 */
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -55,8 +61,7 @@ class UpdateItemActivity : AppCompatActivity() {
             else -> null!!
         }
 
-        /* 콜백 등록 */
-
+        //
         viewModel.setItem(numItem)
     }
 
@@ -71,9 +76,13 @@ class UpdateItemActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val onCommitComplete: (Boolean) -> Unit = { isSucceed ->
+            if (isSucceed)
+                Toast.makeText(this, "변경되었습니다", Toast.LENGTH_SHORT).show()
+        }
         when(item.itemId) {
             R.id.menuComplete -> {
-                if (viewModel.commit()) {
+                if (viewModel.commit(onCommitComplete)) {
                     Toast.makeText(this, "변경 중 입니다 잠시만 기다려주세요", Toast.LENGTH_SHORT).show()
                     intent.putExtra("result", "complete")
                     setResult(RESULT_OK, intent)

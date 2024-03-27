@@ -3,7 +3,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.pragmo.kyeootomi.viewmodel.AddItemViewModel"/>
+            type="com.pragmo.kyeootomi.viewmodel.item.add.AddItemViewModel"/>
     </data>
     <LinearLayout
         android:orientation="vertical"
@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:onItemSelected="@{viewModel::onContentsProviderSelected}"/>
+                android:selectedItemPosition="@={viewModel.contentsProviderOrdinal}"/>
             <FrameLayout
                 android:id="@+id/fragmentInput"
                 android:layout_width="match_parent"

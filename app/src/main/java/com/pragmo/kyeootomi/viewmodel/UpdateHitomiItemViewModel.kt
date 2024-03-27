@@ -46,7 +46,7 @@ class UpdateHitomiItemViewModel(application: Application) : UpdateItemViewModel(
         val reloadInfoValue = reloadInfo.value ?: return false
         val downloadOptValue = downloadOpt.value ?: return false
 
-        val itemValues = Item("hitomi", hitomiItemValue._no, hitomiItemValue.collection, titleValue)
+        val itemValues = Item(Item.ItemType.HITOMI, hitomiItemValue._no, hitomiItemValue.collection, titleValue)
         val hitomiValues = HitomiItem(itemValues, hitomiItemValue.number, downloadOptValue == R.id.radioRetryDownload)
         val onComplete: (Boolean) -> Unit = { isSucceed ->
             if (isSucceed)

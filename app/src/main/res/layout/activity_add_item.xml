@@ -30,8 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:onItemSelected="@{viewModel::onContentsProviderSelected}"
-                android:entries="@array/name_contents_providers"/>
+                android:onItemSelected="@{viewModel::onContentsProviderSelected}"/>
             <FrameLayout
                 android:id="@+id/fragmentInput"
                 android:layout_width="match_parent"

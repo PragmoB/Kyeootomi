@@ -92,9 +92,9 @@ class ItemAdapter(private var items : List<Item>, private val onLongClickItemLis
             binding.check.visibility = View.GONE
         //
         binding.check.isChecked = itemChecked[position]
-        binding.txtTitle.text = item.title?:"제목을 불러올 수 없습니다"
+        binding.txtTitle.text = item.title ?: "제목을 불러올 수 없습니다"
         when (item.type) {
-            "hitomi" -> {
+            Item.ItemType.HITOMI -> {
                 val hitomiItem = item as HitomiItem
                 binding.imgIcon.setImageResource(R.drawable.ic_hitomi)
 
@@ -128,7 +128,7 @@ class ItemAdapter(private var items : List<Item>, private val onLongClickItemLis
                 }
                 binding.wrapview.addView(fragmentHitomiBinding.root)
             }
-            else -> {
+            Item.ItemType.CUSTOM -> {
                 val customItem = item as CustomItem
                 val fragmentCustomBinding = FragmentItemCustomBinding.inflate(inflater, binding.root, false)
                 fragmentCustomBinding.btnWebview.setOnClickListener {

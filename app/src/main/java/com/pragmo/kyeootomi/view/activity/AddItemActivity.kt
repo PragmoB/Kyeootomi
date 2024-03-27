@@ -6,11 +6,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityAddItemBinding
+import com.pragmo.kyeootomi.model.data.Item
 import com.pragmo.kyeootomi.view.fragment.AddCustomFragment
 import com.pragmo.kyeootomi.view.fragment.AddHitomiFragment
 import com.pragmo.kyeootomi.viewmodel.AddItemViewModel
@@ -39,12 +41,26 @@ class AddItemActivity : AppCompatActivity() {
 
         /* MVVM 오늘 처음 공부한거라 잘못쓴걸수도 있지만 뷰 모델 연동 */
 
+        // 컨텐츠 제공 업체 폼 설정
+        val itemTypeValues = Item.ItemType.values()
+        val nameContentsProviders = Array(itemTypeValues.size) { "" }
+        itemTypeValues.forEachIndexed { index, itemType ->
+            nameContentsProviders[index] = if (itemType.domain.isEmpty())
+                itemType.otherName
+            else
+                "${itemType.otherName}(${itemType.domain})"
+        }
+        binding.spinContentsProvider.adapter = ArrayAdapter(
+            this, android.R.layout.simple_spinner_dropdown_item, nameContentsProviders
+        )
+
         // 컨텐츠 제공 업체에 따라 입력 폼 변경
         viewModel.contentsProvider.observe(this) {
+            it ?: return@observe
             val transaction = supportFragmentManager.beginTransaction()
             when (it) {
-                "hitomi" -> transaction.replace(R.id.fragmentInput, AddHitomiFragment(viewModel))
-                "custom" -> transaction.replace(R.id.fragmentInput, AddCustomFragment(viewModel))
+                Item.ItemType.HITOMI -> transaction.replace(R.id.fragmentInput, AddHitomiFragment(viewModel))
+                Item.ItemType.CUSTOM-> transaction.replace(R.id.fragmentInput, AddCustomFragment(viewModel))
             }
             transaction.commit()
         }

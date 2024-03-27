@@ -381,7 +381,7 @@ class ItemModel(private val context : Context) {
         val collectionModel = CollectionModel(context)
         val collection = collectionModel.get(numCollection)!!
         val item = Item(
-            "hitomi",
+            Item.ItemType.HITOMI,
             numItem,
             collection,
             cursor.getString(1)
@@ -417,7 +417,7 @@ class ItemModel(private val context : Context) {
         while (cursor.moveToNext()) {
             val collection = collectionModel.get(numCollection)!!
             val item = Item(
-                "hitomi",
+                Item.ItemType.HITOMI,
                 cursor.getInt(0),
                 collection,
                 if (cursor.isNull(1)) null else cursor.getString(1))
@@ -549,7 +549,7 @@ class ItemModel(private val context : Context) {
         val numCollection = if (cursor.isNull(0)) null else cursor.getInt(0)
         val collectionModel = CollectionModel(context)
         val collection = collectionModel.get(numCollection)!!
-        val item = Item("custom", numItem, collection, cursor.getString(1))
+        val item = Item(Item.ItemType.CUSTOM, numItem, collection, cursor.getString(1))
         val customItem = CustomItem(item, cursor.getString(2))
 
         cursor.close()
@@ -567,7 +567,7 @@ class ItemModel(private val context : Context) {
         val collectionModel = CollectionModel(context)
         while (cursor.moveToNext()) {
             val collection = collectionModel.get(numCollection)!!
-            val item = Item("custom", cursor.getInt(0), collection, cursor.getString(1))
+            val item = Item(Item.ItemType.CUSTOM, cursor.getInt(0), collection, cursor.getString(1))
             val customItem = CustomItem(item, cursor.getString(2))
             listCustom.add(customItem)
         }
@@ -592,14 +592,14 @@ class ItemModel(private val context : Context) {
     /* 공통 */
 
 
-    fun get(itemType: String, numItem: Int) : Item? = when (itemType) {
-        "hitomi" -> getHitomi(numItem)
-        "custom" -> getCustom(numItem)
+    fun get(itemType: Item.ItemType, numItem: Int) : Item? = when (itemType) {
+        Item.ItemType.HITOMI -> getHitomi(numItem)
+        Item.ItemType.CUSTOM -> getCustom(numItem)
         else -> null
     }
-    fun delete(itemType: String, item: Item) = when(itemType) {
-        "hitomi" -> deleteHitomi(item as? HitomiItem ?: null!!)
-        "custom" -> deleteCustom(item as? CustomItem ?: null!!)
+    fun delete(itemType: Item.ItemType, item: Item) = when(itemType) {
+        Item.ItemType.HITOMI -> deleteHitomi(item as? HitomiItem ?: null!!)
+        Item.ItemType.CUSTOM -> deleteCustom(item as? CustomItem ?: null!!)
         else -> { }
     }
     fun getByCollection(numCollection: Int?): List<Item> {
@@ -610,10 +610,12 @@ class ItemModel(private val context : Context) {
             val items = getByCollection(numCollection)
             for (item in items) {
                 when (item.type) {
-                    "hitomi" -> {
+                    Item.ItemType.HITOMI -> {
                         val hitomiItem = item as HitomiItem
                         hitomiItem.filesDir.deleteRecursively()
                     }
+
+                    else -> {}
                 }
             }
         }

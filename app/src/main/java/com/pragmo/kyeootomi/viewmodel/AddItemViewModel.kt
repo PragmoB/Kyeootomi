@@ -24,11 +24,11 @@ class AddItemViewModel(application: Application): AndroidViewModel(application) 
     private val itemModel = ItemModel(application)
 
     private val _collection = MutableLiveData<Collection>()
-    private val _contentsProvider = MutableLiveData<String>()
+    private val _contentsProvider = MutableLiveData<Item.ItemType>()
     private val _title = MutableLiveData<String>()
 
     val collection : LiveData<Collection> = _collection
-    val contentsProvider : LiveData<String> = _contentsProvider
+    val contentsProvider : LiveData<Item.ItemType> = _contentsProvider
     val title : LiveData<String> = _title
 
     // hitomi
@@ -45,9 +45,11 @@ class AddItemViewModel(application: Application): AndroidViewModel(application) 
     val url : LiveData<String> = _url
 
     fun onContentsProviderSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        this._contentsProvider.value =
-            getApplication<Application>().
-            resources.getStringArray(R.array.contents_providers)[position]
+        this._contentsProvider.value = when (position) {
+            Item.ItemType.HITOMI.ordinal -> Item.ItemType.HITOMI
+            Item.ItemType.CUSTOM.ordinal -> Item.ItemType.CUSTOM
+            else -> null!!
+        }
     }
     fun setUseTitle(useTitle : Boolean) {
         this._useTitle.value = useTitle
@@ -83,22 +85,31 @@ class AddItemViewModel(application: Application): AndroidViewModel(application) 
                 Toast.makeText(getApplication(), "추가되었습니다", Toast.LENGTH_SHORT).show()
         }
         when (_contentsProvider.value) {
-            "hitomi" -> {
-                if (_useTitle.value ?: return false)
+            Item.ItemType.HITOMI -> {
+                val useTitleValue = _useTitle.value ?: return false
+                val titleValue = if (useTitleValue)
                     _title.value ?: return false
-                val item = Item("hitomi", 0, _collection.value ?: return false, _title.value)
+                else
+                    ""
+                val collectionValue = _collection.value ?: return false
+                val numberValue = _number.value ?: return false
+                val downloadValue = _downloaded.value ?: return false
+
+                val item = Item(Item.ItemType.HITOMI, 0, collectionValue, titleValue)
                 val hitomiItem = HitomiItem(
                     item,
-                    _number.value ?: return false,
-                    _downloaded.value ?: return false)
-                itemModel.addHitomi(hitomiItem, _useTitle.value ?: return false, onCommitComplete)
+                    numberValue,
+                    downloadValue)
+                itemModel.addHitomi(hitomiItem, useTitleValue, onCommitComplete)
                 return true
             }
-            "custom" -> {
-                val item = Item("custom", 0, _collection.value ?: return false, _title.value ?: return false)
-                val customItem = CustomItem(
-                    item,
-                    _url.value ?: return false)
+            Item.ItemType.CUSTOM -> {
+                val collectionValue = _collection.value ?: return false
+                val titleValue = _title.value ?: return false
+                val urlValue = _url.value ?: return false
+
+                val item = Item(Item.ItemType.CUSTOM, 0, collectionValue, titleValue)
+                val customItem = CustomItem(item, urlValue)
                 return itemModel.addCustom(customItem)
             }
             else -> return false

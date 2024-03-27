@@ -8,18 +8,24 @@ class ToggleAnimation {
 
     companion object {
 
-        fun toggleArrow(view: View, isExpanded: Boolean): Boolean {
-            return if (isExpanded) {
-                view.animate().setDuration(200).rotation(180f)
-                true
+        fun toggle(view: View, viewHeight: Int, arrow: View, expand: Boolean) {
+            val velocity = view.context.resources.displayMetrics.density
+            toggleArrow(arrow, expand, (viewHeight / velocity - 30).toLong())
+            if (expand)
+                expand(view, viewHeight, velocity)
+            else
+                collapse(view, velocity)
+        }
+        fun toggleArrow(arrow: View, expand: Boolean, duration: Long) {
+            if (expand) {
+                arrow.animate().setDuration(duration).rotation(180f)
             } else {
-                view.animate().setDuration(200).rotation(0f)
-                false
+                arrow.animate().setDuration(duration).rotation(0f)
             }
         }
 
 
-        fun expand(view: View, height: Int) {
+        fun expand(view: View, height: Int, velocity: Float) {
             view.layoutParams.height = 0
             view.visibility = View.VISIBLE
 
@@ -30,12 +36,12 @@ class ToggleAnimation {
                 }
             }
 
-            animation.duration = (height / view.context.resources.displayMetrics.density).toLong()
+            animation.duration = (height / velocity).toLong()
 
             view.startAnimation(animation)
         }
 
-        fun collapse(view: View) {
+        fun collapse(view: View, velocity: Float) {
             val actualHeight = view.height
 
             val animation = object : Animation() {
@@ -49,7 +55,7 @@ class ToggleAnimation {
                 }
             }
 
-            animation.duration = (actualHeight / view.context.resources.displayMetrics.density).toLong()
+            animation.duration = (actualHeight / velocity).toLong()
             view.startAnimation(animation)
         }
     }

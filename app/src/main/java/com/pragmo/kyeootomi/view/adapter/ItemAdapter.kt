@@ -28,16 +28,35 @@ import com.pragmo.kyeootomi.view.activity.item.read.ReadHitomiActivity
 class ItemAdapter(private var items : List<Item>, private val onLongClickItemListener: (ItemAdapter) -> Unit)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private val checkViews = Array<CheckBox?>(items.size) { null }
     var selectMode = false
         set(value) {
-            val fieldBefore = field
+            if (field == value)
+                return
+
+            // selectMode 변경 시 checkView 나타내기/숨기기, 값 바꾸기 작업
             field = value
-            if (!field)
-                itemChecked.fill(false)
-            if (fieldBefore != field)
-                notifyDataSetChanged()
+            for (checkView in checkViews) {
+                checkView ?: return
+                if (field) {
+                    // 체크박스 나타나기 애니메이션
+                    checkView.visibility = View.INVISIBLE
+                    checkView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener{
+                        override fun onGlobalLayout() {
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                checkView.visibility = View.VISIBLE
+                                val appearAnim = AnimationUtils.loadAnimation(checkView.context, R.anim.appear)
+                                checkView.startAnimation(appearAnim) }, 80)
+                            checkView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        }
+                    })
+                } else {
+                    checkView.isChecked = false
+                    checkView.visibility = View.GONE
+                }
+            }
         }
-    private val itemChecked = Array(items.size) { false }
+
 
     internal class HitomiViewHolder(val binding : ItemHitomiBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(hitomiItem: HitomiItem) {
@@ -141,36 +160,17 @@ class ItemAdapter(private var items : List<Item>, private val onLongClickItemLis
         }
 
         // notifyDataSetChanged호출 마다 bind를 하는데, view holder가 재활용 되는 경우가 종종 있어서 초기화를 처음부터 싹 다 해야됨..
+        checkViews[position] = checkView
         ToggleAnimation.toggleArrow(imgArrow, false, 0)
         expandableView.visibility = View.VISIBLE // 이거 한줄 추가했더니 wrapViewHeight값 계산이 멀쩡하게 잘된다. 대체왜..?
         expandableView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
         expandableView.requestLayout()
-        checkView.setOnCheckedChangeListener { _, isChecked ->
-            itemChecked[position] = isChecked
-        }
         // 항목 꾹 눌러서 선택하기 설정
         rootItem.setOnLongClickListener {
-            checkView.isChecked = true
+            checkView.isChecked = !checkView.isChecked
             onLongClickItemListener(this)
             true
         }
-        // 체크박스 나타나기 애니메이션
-        if (selectMode) {
-            checkView.visibility = View.INVISIBLE
-            checkView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener{
-                override fun onGlobalLayout() {
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        checkView.visibility = View.VISIBLE
-                        val appearAnim = AnimationUtils.loadAnimation(rootItem.context, R.anim.appear)
-                        checkView.startAnimation(appearAnim)
-                    }, 80)
-                    checkView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                }
-            })
-        } else
-            checkView.visibility = View.GONE
-        // 데이터 => 뷰 동기화
-        checkView.isChecked = itemChecked[position]
 
         // wrapviewHeight = 펼쳐질 항목의 높이 측정 ) 사실 view.measure로 측정했었지만 (이 문제와는 별개로 표시되는 히토미 작품의 정보량이 너무 많아서 높이 300dp를 넘어 넘쳐버리는 일 때문에)
         // xml 레이아웃좀 수정했더니 맛가버림 왜그런지는 5시간정도 고민해보고 검색해보고 했는데 미스터리임.
@@ -192,5 +192,11 @@ class ItemAdapter(private var items : List<Item>, private val onLongClickItemLis
         }
     }
 
-    fun getItemChecked(index: Int) = itemChecked[index]
+    fun selectAll(isChecked: Boolean) {
+        selectMode = true
+        for (checkView in checkViews)
+            checkView!!.isChecked = isChecked
+    }
+
+    fun getItemChecked(index: Int) = checkViews[index]!!.isChecked
 }

@@ -193,7 +193,6 @@ class ItemAdapter(private var items : List<Item>, private val onLongClickItemLis
     }
 
     fun selectAll(isChecked: Boolean) {
-        selectMode = true
         for (checkView in checkViews)
             checkView!!.isChecked = isChecked
     }

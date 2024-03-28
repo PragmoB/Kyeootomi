@@ -1,7 +1,6 @@
 package com.pragmo.kyeootomi.view.activity
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -164,6 +163,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 selectedItemIndex.add(i)
         }
         when(menuItem.itemId) {
+            R.id.menuSelectAll -> {
+                itemAdapter.selectAll(selectedItemIndex.size != listItemValue.size)
+            }
             R.id.menuUpdateItem -> { // 작품 업데이트
                 // 업데이트할 작품은 하나여야 함
                 if (selectedItemIndex.size != 1) {

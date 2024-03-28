@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/menuSelectAll"
+        android:title="전체"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/menuUpdateItem"
         android:title="수정"/>
 </menu>

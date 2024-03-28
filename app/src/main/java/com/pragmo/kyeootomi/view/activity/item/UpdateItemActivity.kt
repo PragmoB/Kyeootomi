@@ -11,7 +11,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityUpdateItemBinding
 import com.pragmo.kyeootomi.model.data.Item
+import com.pragmo.kyeootomi.view.fragment.item.update.UpdateCustomFragment
 import com.pragmo.kyeootomi.view.fragment.item.update.UpdateHitomiFragment
+import com.pragmo.kyeootomi.viewmodel.item.update.UpdateCustomViewModel
 import com.pragmo.kyeootomi.viewmodel.item.update.UpdateHitomiViewModel
 import com.pragmo.kyeootomi.viewmodel.item.update.UpdateItemViewModel
 
@@ -35,10 +37,12 @@ class UpdateItemActivity : AppCompatActivity() {
         //
         viewModel = when (itemType) {
             Item.ItemType.HITOMI -> ViewModelProvider(this)[UpdateHitomiViewModel::class.java]
+            Item.ItemType.CUSTOM -> ViewModelProvider(this)[UpdateCustomViewModel::class.java]
             else -> null!!
         }
         val fragment = when (itemType) {
             Item.ItemType.HITOMI -> UpdateHitomiFragment.newInstance()
+            Item.ItemType.CUSTOM -> UpdateCustomFragment.newInstance()
             else -> null!!
         }
         val transaction = supportFragmentManager.beginTransaction()

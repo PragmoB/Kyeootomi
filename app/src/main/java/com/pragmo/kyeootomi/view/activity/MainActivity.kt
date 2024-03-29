@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             /* 작품 리스트 렌더링 */
 
             if (it != null)
-                binding.recyclerDocument.adapter = ItemAdapter(it, onLongClickItemListener)
+                binding.recyclerDocument.adapter = ItemAdapter(it, false, onLongClickItemListener)
 
             setSelectMode(false)
         }
@@ -156,29 +156,49 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         // 선택된 작품 항목의 인덱스 값들을 selectedItemIndex에 추출
         val listItemValue = viewModel.listItem.value ?: return false
-        val selectedItemIndex = mutableListOf<Int>()
+        val selectedItemIndexes = mutableListOf<Int>()
         val itemAdapter = binding.recyclerDocument.adapter as ItemAdapter
         for (i in listItemValue.indices) {
             if (itemAdapter.getItemChecked(i))
-                selectedItemIndex.add(i)
+                selectedItemIndexes.add(i)
         }
         when(menuItem.itemId) {
             R.id.menuSelectAll -> {
-                itemAdapter.selectAll(selectedItemIndex.size != listItemValue.size)
+                itemAdapter.selectAll(selectedItemIndexes.size != listItemValue.size)
             }
             R.id.menuUpdateItem -> { // 작품 업데이트
                 // 업데이트할 작품은 하나여야 함
-                if (selectedItemIndex.size != 1) {
+                if (selectedItemIndexes.size != 1) {
                     Toast.makeText(this, "하나만 선택해주세요", Toast.LENGTH_SHORT).show()
                     return false
                 }
 
                 // 데이터 셋팅 후 업데이트 액티비티 시작
-                val item = listItemValue[selectedItemIndex[0]]
+                val item = listItemValue[selectedItemIndexes[0]]
                 val intentUpdateItem = Intent(this, UpdateItemActivity::class.java)
                 intentUpdateItem.putExtra("numItem", item._no)
                 intentUpdateItem.putExtra("itemType", item.type)
                 onUpdateItemResultLauncher.launch(intentUpdateItem)
+            }
+            R.id.menuDeleteItem -> { // 작품 삭제
+                if (selectedItemIndexes.size < 1) {
+                    Toast.makeText(this, "하나 이상 선택해주세요", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+
+                val dlg = AlertDialog.Builder(this)
+                dlg.setTitle("작품 삭제")
+                dlg.setMessage("선택하신 작품 ${selectedItemIndexes.size}개 항목을 삭제합니다.\n계속하시겠습니까?")
+                dlg.setNegativeButton("취소", null)
+                dlg.setPositiveButton("확인") { _, _ ->
+                    selectedItemIndexes.sortDescending()
+                    for (selectedItemIndex in selectedItemIndexes) {
+                        viewModel.deleteItem(selectedItemIndex)
+                        itemAdapter.deleteItem(selectedItemIndex)
+                    }
+                    Toast.makeText(this, "삭제되었습니다", Toast.LENGTH_SHORT).show()
+                }
+                dlg.show()
             }
         }
         return super.onOptionsItemSelected(menuItem)
@@ -214,7 +234,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 dlg.setPositiveButton("확인") { _, _ ->
                     if (viewModel.addCollection()) {
                         viewModel.loadSubCollections()
-                        Toast.makeText(application, "추가되었습니다", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "추가되었습니다", Toast.LENGTH_SHORT).show()
                     }
                 }
                 dlg.show()
@@ -245,7 +265,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.menuDeleteCollection -> {
                 dlg.setTitle("컬렉션 삭제")
-                dlg.setMessage("남아있는 작품 및\n하위 컬렉션이 모두 삭제됩니다.\n${collectionValue.name} 을(를) 삭제하시겠습니까?")
+                dlg.setMessage("남아있는 작품 및\n하위 컬렉션이 모두 삭제됩니다.\n${collectionValue.name}을(를) 삭제하시겠습니까?")
                 dlg.setPositiveButton("확인") { _, _ ->
                     viewModel.deleteCollection()
                     viewModel.revertCollection()

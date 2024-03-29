@@ -25,10 +25,11 @@ import com.pragmo.kyeootomi.model.data.Item
 import com.pragmo.kyeootomi.view.ToggleAnimation
 import com.pragmo.kyeootomi.view.activity.item.read.ReadHitomiActivity
 
-class ItemAdapter(private var items : List<Item>, private val onLongClickItemListener: (ItemAdapter) -> Unit)
+class ItemAdapter(private val items : MutableList<Item>, private val bindList: Boolean, private val onLongClickItemListener: (ItemAdapter) -> Unit)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val checkViews = Array<CheckBox?>(items.size) { null }
+    private val checkViews = MutableList<CheckBox?>(items.size) { null }
+
     var selectMode = false
         set(value) {
             if (field == value)
@@ -37,7 +38,7 @@ class ItemAdapter(private var items : List<Item>, private val onLongClickItemLis
             // selectMode 변경 시 checkView 나타내기/숨기기, 값 바꾸기 작업
             field = value
             for (checkView in checkViews) {
-                checkView ?: return
+                checkView!!
                 if (field) {
                     // 체크박스 나타나기 애니메이션
                     checkView.visibility = View.INVISIBLE
@@ -198,4 +199,11 @@ class ItemAdapter(private var items : List<Item>, private val onLongClickItemLis
     }
 
     fun getItemChecked(index: Int) = checkViews[index]!!.isChecked
+
+    fun deleteItem(position: Int) {
+        if (bindList) // recycler view 항목 삭제 시 list 항목 삭제옵션
+            items.removeAt(position)
+        checkViews.removeAt(position)
+        notifyItemRemoved(position)
+    }
 }

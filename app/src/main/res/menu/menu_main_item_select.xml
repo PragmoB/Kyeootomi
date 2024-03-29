@@ -8,4 +8,7 @@
     <item
         android:id="@+id/menuUpdateItem"
         android:title="수정"/>
+    <item
+        android:id="@+id/menuDeleteItem"
+        android:title="삭제"/>
 </menu>

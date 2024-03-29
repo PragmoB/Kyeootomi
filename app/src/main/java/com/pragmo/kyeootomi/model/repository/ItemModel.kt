@@ -516,7 +516,7 @@ class ItemModel(private val context : Context) {
         hitomiItem.filesDir.deleteRecursively()
 
         val db = ItemDBHelper(context).writableDatabase
-        db.delete("HitomiItem", "_no=?", arrayOf(hitomiItem.number.toString()))
+        db.delete("HitomiItem", "_no=?", arrayOf(hitomiItem._no.toString()))
     }
 
     /* 커스텀 항목 처리 */

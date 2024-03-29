@@ -15,11 +15,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val collectionModel = CollectionModel(application)
     private val itemModel = ItemModel(application)
 
-    private val _listItem = MutableLiveData<List<Item>>()
+    private val _listItem = MutableLiveData<MutableList<Item>>()
     private val _listSubCollections = MutableLiveData<List<Collection>>()
     private val _collection = MutableLiveData<Collection>()
 
-    val listItem : LiveData<List<Item>> = _listItem
+    val listItem : LiveData<MutableList<Item>> = _listItem
     val listSubCollections : LiveData<List<Collection>> = _listSubCollections
     val collection : LiveData<Collection> = _collection
 
@@ -54,7 +54,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadItems() {
         val collectionValue = _collection.value?:return
-        _listItem.value = itemModel.getByCollection(collectionValue.num)
+        _listItem.value = itemModel.getByCollection(collectionValue.num).toMutableList()
+    }
+    fun deleteItem(index: Int) {
+        val listItemValue = _listItem.value ?: return
+
+        val item = listItemValue[index]
+        itemModel.delete(item.type, item)
+        listItemValue.removeAt(index)
     }
     fun setCollection(numCollection: Int?) {
         _collection.value = collectionModel.get(numCollection)

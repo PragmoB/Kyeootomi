@@ -180,8 +180,9 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
         expandableView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 expandableHeight = expandableView.height
+                expandableView.layoutParams.height = 0
+                expandableView.requestLayout()
                 expandableView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                expandableView.visibility = View.GONE
             }
         })
 

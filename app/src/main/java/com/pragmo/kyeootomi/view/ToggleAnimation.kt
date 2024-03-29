@@ -10,34 +10,40 @@ class ToggleAnimation {
 
         fun toggle(view: View, viewHeight: Int, arrow: View, expand: Boolean) {
             val velocity = view.context.resources.displayMetrics.density
-            toggleArrow(arrow, expand, (viewHeight / velocity - 30).toLong())
-            if (expand)
+            if (expand) {
+                toggleArrow(arrow, true, ((viewHeight - view.height) / velocity - 30).toLong())
                 expand(view, viewHeight, velocity)
-            else
+            }
+            else {
+                toggleArrow(arrow, false, (view.height / velocity - 30).toLong())
                 collapse(view, velocity)
+            }
         }
         fun toggleArrow(arrow: View, expand: Boolean, duration: Long) {
-            if (expand) {
-                arrow.animate().setDuration(duration).rotation(180f)
-            } else {
-                arrow.animate().setDuration(duration).rotation(0f)
-            }
+            val animator = if (duration > 0)
+                arrow.animate().setDuration(duration)
+            else
+                arrow.animate().setDuration(0)
+
+            if (expand)
+                animator.rotation(180f)
+            else
+                animator.rotation(0f)
         }
 
 
         fun expand(view: View, height: Int, velocity: Float) {
-            view.layoutParams.height = 0
             view.visibility = View.VISIBLE
+            val actualHeight = view.height
 
             val animation = object : Animation() {
                 override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-                    view.layoutParams.height = (height * interpolatedTime).toInt()
+                    view.layoutParams.height = (actualHeight + ((height - actualHeight) * interpolatedTime)).toInt()
                     view.requestLayout()
                 }
             }
 
-            animation.duration = (height / velocity).toLong()
-
+            animation.duration = ((height - actualHeight) / velocity).toLong()
             view.startAnimation(animation)
         }
 

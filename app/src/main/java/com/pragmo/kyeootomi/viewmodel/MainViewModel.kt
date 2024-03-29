@@ -28,6 +28,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun addCollection(): Boolean {
         val collectionValue = _collection.value ?: return false
         val formCollectionNameValue = formCollectionName.value ?: return false
+        if (formCollectionNameValue.isEmpty())
+            return false
 
         val subCollection = Collection(0, collectionValue.num, formCollectionNameValue)
         collectionModel.add(subCollection)
@@ -40,6 +42,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun updateCollection(): Boolean {
         val collectionValue = _collection.value ?: return false
         val formCollectionNameValue = formCollectionName.value ?: return false
+        if (formCollectionNameValue.isEmpty())
+            return false
 
         if (collectionValue.num == null) // 최상위 컬렉션은 이름 변경 불가능
             return false

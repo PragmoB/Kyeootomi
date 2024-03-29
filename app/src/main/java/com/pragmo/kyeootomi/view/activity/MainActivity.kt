@@ -223,6 +223,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
             R.id.menuAddCollection -> {
+                viewModel.formCollectionName.value = ""
                 formCollectionBinding.editCollectionName.requestFocus()
                 formCollectionBinding.editCollectionName.postDelayed({
                     val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -248,7 +249,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 // 컬렉션 입력 편의기능 세팅
-                formCollectionBinding.editCollectionName.setText(collectionValue.name)
+                viewModel.formCollectionName.value = collectionValue.name
                 formCollectionBinding.editCollectionName.requestFocus(collectionValue.name.length)
                 formCollectionBinding.editCollectionName.postDelayed({
                     val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

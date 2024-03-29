@@ -197,6 +197,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         itemAdapter.deleteItem(selectedItemIndex)
                     }
                     Toast.makeText(this, "삭제되었습니다", Toast.LENGTH_SHORT).show()
+                    setSelectMode(false)
                 }
                 dlg.show()
             }

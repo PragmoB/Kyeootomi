@@ -35,23 +35,60 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var menu: Menu
     private lateinit var toggle : ActionBarDrawerToggle
 
-    private fun setSelectMode(selectMode: Boolean) {
-        val itemAdapter = binding.recyclerDocument.adapter as ItemAdapter
+    private var mode: Mode = Mode.DEFAULT
+        set(value) {
+            if (field == value)
+                return
+            field = value
 
-        if (selectMode) {
-            itemAdapter.selectMode = true
-            if (!menu.hasVisibleItems() && ::menu.isInitialized)
-                menuInflater.inflate(R.menu.menu_main_item_select, menu)
-            binding.btnAddItem.visibility = View.GONE
-            binding.refreshDocument.isEnabled = false
-        } else {
-            if (::menu.isInitialized)
-                menu.clear()
-            itemAdapter.selectMode = false
-            binding.btnAddItem.visibility = View.VISIBLE
-            binding.refreshDocument.isEnabled = true
+            val itemAdapter = binding.recyclerDocument.adapter as ItemAdapter
+            when (value) {
+                Mode.DEFAULT -> {
+                    if (::menu.isInitialized)
+                        menu.clear()
+                    itemAdapter.selectMode = false
+                    binding.btnAddItem.visibility = View.VISIBLE
+                    viewModel.listItemsWaitingToRelocate.value?.let {
+                        val collectionValue = viewModel.collection.value!!
+                        if (it[0].collection.num == collectionValue.num)
+                            for (itemWaitingToRelocateValue in it) {
+                                viewModel.insertItem(0, itemWaitingToRelocateValue)
+                                itemAdapter.insertItem(0, itemWaitingToRelocateValue)
+                            }
+                    }
+                    viewModel.resetItemsWaiting()
+                    binding.bottomNavigationView.visibility = View.GONE
+                }
+                Mode.SELECT_ITEM -> {
+                    if (!menu.hasVisibleItems() && ::menu.isInitialized)
+                        menuInflater.inflate(R.menu.menu_main_select_item, menu)
+                    itemAdapter.selectMode = true
+                    binding.btnAddItem.visibility = View.GONE
+                    viewModel.listItemsWaitingToRelocate.value?.let {
+                        val collectionValue = viewModel.collection.value!!
+                        if (it[0].collection.num == collectionValue.num)
+                            for (itemWaitingToRelocateValue in it) {
+                                viewModel.insertItem(0, itemWaitingToRelocateValue)
+                                itemAdapter.insertItem(0, itemWaitingToRelocateValue)
+                            }
+                    }
+                    viewModel.resetItemsWaiting()
+                    binding.bottomNavigationView.visibility = View.GONE
+                }
+                Mode.RELOCATE_ITEM -> {
+                    menu.clear()
+                    itemAdapter.selectMode = false
+                    binding.btnAddItem.visibility = View.GONE
+                    viewModel.listItemsWaitingToRelocate.value!!
+                    binding.bottomNavigationView.visibility = View.VISIBLE
+                }
+            }
         }
+
+    enum class Mode {
+        DEFAULT, SELECT_ITEM, RELOCATE_ITEM
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.setCollection(null)
@@ -96,25 +133,58 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.naviView.setNavigationItemSelectedListener(this)
         val backPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                val itemAdapter = binding.recyclerDocument.adapter as ItemAdapter
-                if (itemAdapter.selectMode) {
-                    setSelectMode(false)
+                if (mode != Mode.DEFAULT && mode != Mode.RELOCATE_ITEM) {
+                    mode = Mode.DEFAULT
                 } else
                     finish()
             }
         }
         onBackPressedDispatcher.addCallback(this, backPressedCallback)
-        val onLongClickItemListener: (ItemAdapter) -> Unit = { // 작품 길게 누를때
-            setSelectMode(true)
+        binding.bottomNavigationView.setOnItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.menuCancelRelocation -> {
+                    val collectionValue = viewModel.collection.value ?: return@setOnItemSelectedListener false
+                    val itemsWaitingToRelocateValue = viewModel.listItemsWaitingToRelocate.value!!
+                    if (itemsWaitingToRelocateValue[0].collection.num == collectionValue.num) {
+                        val itemAdapter = binding.recyclerDocument.adapter as ItemAdapter
+                        for (itemWaitingToRelocateValue in itemsWaitingToRelocateValue) {
+                            viewModel.insertItem(0, itemWaitingToRelocateValue)
+                            itemAdapter.insertItem(0, itemWaitingToRelocateValue)
+                        }
+                    }
+                    viewModel.resetItemsWaiting()
+
+                    mode = Mode.DEFAULT
+                    true
+                }
+                R.id.menuRelocateItem -> {
+                    viewModel.relocateItemsWaiting { item, succeed ->
+                        if (succeed) {
+                            val itemAdapter = binding.recyclerDocument.adapter as ItemAdapter
+                            viewModel.insertItem(0, item)
+                            itemAdapter.insertItem(0, item)
+                        }
+                        else
+                            Toast.makeText(this, "실패했습니다", Toast.LENGTH_SHORT).show()
+                    }
+                    mode = Mode.DEFAULT
+                    true
+                }
+                else -> false
+            }
         }
-        viewModel.listItem.observe(this) {
+        val onLongClickItemListener: (ItemAdapter) -> Unit = { // 작품 길게 누를때
+            mode = Mode.SELECT_ITEM
+        }
+        viewModel.listItems.observe(this) {
 
             /* 작품 리스트 렌더링 */
 
             if (it != null)
                 binding.recyclerDocument.adapter = ItemAdapter(it, false, onLongClickItemListener)
 
-            setSelectMode(false)
+            if (mode != Mode.RELOCATE_ITEM)
+                mode = Mode.DEFAULT
         }
         viewModel.listSubCollections.observe(this) {
 
@@ -136,6 +206,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             txtPath.text = viewModel.getPath().replace("/", " > ")
         }
 
+        viewModel.resetItemsWaiting()
         viewModel.loadItems()
         viewModel.loadSubCollections()
     }
@@ -148,14 +219,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val intentResult = it.data ?: return@registerForActivityResult
         // '완료'버튼 클릭으로 끝났다면
         if (intentResult.getStringExtra("result") == "complete")
-            setSelectMode(false)
+            mode = Mode.DEFAULT
     }
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         if (toggle.onOptionsItemSelected(menuItem))
             return true
 
         // 선택된 작품 항목의 인덱스 값들을 selectedItemIndex에 추출
-        val listItemValue = viewModel.listItem.value ?: return false
+        val listItemValue = viewModel.listItems.value ?: return false
         val selectedItemIndexes = mutableListOf<Int>()
         val itemAdapter = binding.recyclerDocument.adapter as ItemAdapter
         for (i in listItemValue.indices) {
@@ -197,9 +268,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         itemAdapter.deleteItem(selectedItemIndex)
                     }
                     Toast.makeText(this, "삭제되었습니다", Toast.LENGTH_SHORT).show()
-                    setSelectMode(false)
+                    mode = Mode.DEFAULT
                 }
                 dlg.show()
+            }
+            R.id.menuMoveCollection -> {
+                if (selectedItemIndexes.size < 1) {
+                    Toast.makeText(this, "하나 이상 선택해주세요", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+
+                selectedItemIndexes.sortDescending()
+                for (selectedItemIndex in selectedItemIndexes) {
+                    viewModel.requeueItemIntoWaiting(selectedItemIndex)
+                    itemAdapter.deleteItem(selectedItemIndex)
+                }
+                mode = Mode.RELOCATE_ITEM
             }
         }
         return super.onOptionsItemSelected(menuItem)
@@ -278,7 +362,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             /* 컬렉션 선택 */
 
             else -> {
-                binding.drawer.close()
                 Handler(mainLooper).post {
                     viewModel.setCollection(item.itemId)
                 }

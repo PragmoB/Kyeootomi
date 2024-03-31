@@ -162,6 +162,11 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
 
         // notifyDataSetChanged호출 마다 bind를 하는데, view holder가 재활용 되는 경우가 종종 있어서 초기화를 처음부터 싹 다 해야됨..
         checkViews[position] = checkView
+        if (selectMode)
+            checkView.visibility = View.VISIBLE
+        else
+            checkView.visibility = View.GONE
+        checkView.isChecked = false
         ToggleAnimation.toggleArrow(imgArrow, false, 0)
         expandableView.visibility = View.VISIBLE // 이거 한줄 추가했더니 wrapViewHeight값 계산이 멀쩡하게 잘된다. 대체왜..?
         expandableView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
@@ -201,6 +206,12 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
 
     fun getItemChecked(index: Int) = checkViews[index]!!.isChecked
 
+    fun insertItem(position: Int, item: Item) {
+        if (bindList)
+            items.add(position, item)
+        checkViews.add(position, null)
+        notifyItemInserted(position)
+    }
     fun deleteItem(position: Int) {
         if (bindList) // recycler view 항목 삭제 시 list 항목 삭제옵션
             items.removeAt(position)

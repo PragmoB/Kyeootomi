@@ -10,6 +10,10 @@ open class Item(
     var title : String?
 ) {
 
+    companion object {
+        lateinit var filesDir : File
+    }
+
     enum class ItemType(val otherName: String, val domain: String) {
         HITOMI("히토미", "hitomi.la"), CUSTOM("사용자 지정", "")
     }

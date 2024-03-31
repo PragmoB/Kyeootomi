@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menuCancelRelocation"
+        android:icon="@drawable/baseline_cancel_24"
+        android:title="취소"/>
+    <item
+        android:id="@+id/menuRelocateItem"
+        android:icon="@drawable/baseline_done_24"
+        android:title="여기로 이동"/>
+</menu>

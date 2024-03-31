@@ -370,7 +370,7 @@ class ItemModel(private val context : Context) {
         val cursor = db.query(
             "HitomiItem",
             arrayOf("collection", "title", "number", "downloaded", "date", "artist", "series", "tags"),
-            "_no=?",
+            "_no=? and reachable=1",
             arrayOf(numItem.toString()),
             null, null, null
         )
@@ -407,7 +407,7 @@ class ItemModel(private val context : Context) {
         val cursor = db.query(
             "HitomiItem",
             arrayOf("_no", "title", "number", "downloaded", "date", "artist", "series", "tags"),
-            if (numCollection == null) "collection IS NULL" else "collection=?",
+            if (numCollection == null) "collection IS NULL and reachable=1" else "collection=? and reachable=1",
             if (numCollection == null) null else arrayOf(numCollection.toString()),
             null, null, null)
 
@@ -443,6 +443,8 @@ class ItemModel(private val context : Context) {
             val values = ContentValues()
             hitomiValues.collection.num?.let {
                 values.put("collection", it)
+            } ?: run {
+                values.putNull("collection")
             }
             if (useTitle)
                 values.put("title", hitomiValues.title)
@@ -470,7 +472,7 @@ class ItemModel(private val context : Context) {
             }
 
             val db = ItemDBHelper(context).writableDatabase
-            db.update("HitomiItem", values, "_no=?", arrayOf(numItem.toString()))
+            db.update("HitomiItem", values, "_no=? and reachable=1", arrayOf(numItem.toString()))
             onComplete(true)
 
             if (bun == null)
@@ -489,21 +491,23 @@ class ItemModel(private val context : Context) {
                 }
         }
 
+        val hitomiItem = getHitomi(numItem) ?: return
+
         // 작품 파일 삭제 관련 처리
         if (useDownloadOpt && hitomiValues.downloaded) // 작품 파일 다시 받기 옵션
-            hitomiValues.filesDir.deleteRecursively()
+            hitomiItem.filesDir.deleteRecursively()
         else if (useDownloadOpt) // 작품 파일 삭제 옵션
-            hitomiValues.getFile(1)?.let { coverFile ->
+            hitomiItem.getFile(1)?.let { coverFile ->
 
             // 커버 이미지(1.webp) 빼고 작품 파일 삭제
             val coverFileName = coverFile.absolutePath.split("/").let {
                 it[it.size - 1]
             }
-            val coverFileTemp = File(hitomiValues.collection.dir, "1.tmp")
+            val coverFileTemp = File(Item.filesDir, "1.tmp")
             coverFile.renameTo(coverFileTemp)
-            hitomiValues.filesDir.deleteRecursively()
+            hitomiItem.filesDir.deleteRecursively()
             File(hitomiValues.filesDir, coverFileName).let { coverFileTemp.renameTo(it) }
-        } ?: run { hitomiValues.filesDir.deleteRecursively() }
+        } ?: run { hitomiItem.filesDir.deleteRecursively() }
 
         // 크롤링 필요 여부 판단
         if (reloadInfo || (useDownloadOpt && hitomiValues.downloaded) || !useTitle) // 작품 정보 다시받기 또는 파일 다시받기 또는 제목 자동설정 시 크롤링 필요
@@ -516,7 +520,7 @@ class ItemModel(private val context : Context) {
         hitomiItem.filesDir.deleteRecursively()
 
         val db = ItemDBHelper(context).writableDatabase
-        db.delete("HitomiItem", "_no=?", arrayOf(hitomiItem._no.toString()))
+        db.delete("HitomiItem", "_no=? and reachable=1", arrayOf(hitomiItem._no.toString()))
     }
 
     /* 커스텀 항목 처리 */
@@ -538,7 +542,7 @@ class ItemModel(private val context : Context) {
         val cursor = db.query(
             "CustomItem",
             arrayOf("collection", "title", "URL", "date"),
-            "_no=?",
+            "_no=? and reachable=1",
             arrayOf(numItem.toString()),
             null, null, null
         )
@@ -560,7 +564,7 @@ class ItemModel(private val context : Context) {
         val listCustom = mutableListOf<CustomItem>()
         val cursor = db.query("CustomItem",
             arrayOf("_no", "title", "URL", "date"),
-            if (numCollection == null) "collection IS NULL" else "collection=?",
+            if (numCollection == null) "collection IS NULL and reachable=1" else "collection=? and reachable=1",
             if (numCollection == null) null else arrayOf(numCollection.toString()),
             null, null, null)
 
@@ -582,15 +586,14 @@ class ItemModel(private val context : Context) {
         values.put("URL", customValues.url)
 
         val db = ItemDBHelper(context).writableDatabase
-        db.update("CustomItem", values, "_no=?", arrayOf(numItem.toString()))
+        db.update("CustomItem", values, "_no=? and reachable=1", arrayOf(numItem.toString()))
     }
     fun deleteCustom(customItem: CustomItem) {
         val db = ItemDBHelper(context).writableDatabase
-        db.delete("CustomItem", "_no=?", arrayOf(customItem._no.toString()))
+        db.delete("CustomItem", "_no=? and reachable=1", arrayOf(customItem._no.toString()))
     }
 
     /* 공통 */
-
 
     fun get(itemType: Item.ItemType, numItem: Int) : Item? = when (itemType) {
         Item.ItemType.HITOMI -> getHitomi(numItem)
@@ -600,23 +603,39 @@ class ItemModel(private val context : Context) {
     fun delete(itemType: Item.ItemType, item: Item) = when(itemType) {
         Item.ItemType.HITOMI -> deleteHitomi(item as? HitomiItem ?: null!!)
         Item.ItemType.CUSTOM -> deleteCustom(item as? CustomItem ?: null!!)
-        else -> { }
     }
     fun getByCollection(numCollection: Int?): List<Item> {
         return getHitomiByCollection(numCollection) + getCustomByCollection(numCollection)
     }
-    fun deleteByCollection(numCollection: Int?, deleteFiles : Boolean = true) {
-        if (deleteFiles) {
-            val items = getByCollection(numCollection)
-            for (item in items) {
-                when (item.type) {
-                    Item.ItemType.HITOMI -> {
-                        val hitomiItem = item as HitomiItem
-                        hitomiItem.filesDir.deleteRecursively()
-                    }
+    fun setReachable(itemType: Item.ItemType, numItem: Int, reachable: Boolean) {
+        val values = ContentValues()
+        values.put("reachable", reachable)
 
-                    else -> {}
+        val db = ItemDBHelper(context).writableDatabase
+        val tableName = when (itemType) {
+            Item.ItemType.HITOMI -> "HitomiItem"
+            Item.ItemType.CUSTOM -> "CustomItem"
+        }
+        db.update(tableName, values, "_no=?", arrayOf(numItem.toString()))
+    }
+    fun setReachableAll(reachable: Boolean) {
+        val values = ContentValues()
+        values.put("reachable", reachable)
+
+        val db = ItemDBHelper(context).writableDatabase
+        db.update("HitomiItem", values, null, null)
+        db.update("CustomItem", values, null, null)
+    }
+    fun deleteByCollection(numCollection: Int?) {
+        val items = getByCollection(numCollection)
+        for (item in items) {
+            when (item.type) {
+                Item.ItemType.HITOMI -> {
+                    val hitomiItem = item as HitomiItem
+                    hitomiItem.filesDir.deleteRecursively()
                 }
+
+                else -> {}
             }
         }
         val db = ItemDBHelper(context).writableDatabase

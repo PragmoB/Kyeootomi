@@ -15,7 +15,7 @@ class KyeootomiApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         registerReceiver(downloadReceiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-        Collection.filesDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!
+        Item.filesDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!
     }
 
 }

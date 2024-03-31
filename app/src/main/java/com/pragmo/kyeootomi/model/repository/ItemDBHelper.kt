@@ -16,7 +16,8 @@ class ItemDBHelper(context: Context) : SQLiteOpenHelper(context, "item_db", null
                     "downloaded INTEGER NOT NULL," +
                     "artist TEXT," +
                     "series TEXT," +
-                    "tags TEXT)"
+                    "tags TEXT," +
+                    "reachable INTEGER NOT NULL DEFAULT 1)"
         )
         db?.execSQL(
             "CREATE TABLE CustomItem (" +
@@ -24,7 +25,8 @@ class ItemDBHelper(context: Context) : SQLiteOpenHelper(context, "item_db", null
                     "collection INT," +
                     "date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP," +
                     "title TEXT," +
-                    "URL TEXT NOT NULL)"
+                    "URL TEXT NOT NULL," +
+                    "reachable INTEGER NOT NULL DEFAULT 1)"
         )
     }
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {

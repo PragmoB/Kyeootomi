@@ -56,6 +56,22 @@
                 app:layout_anchorGravity="bottom|right"
                 android:layout_margin="30dp"
                 app:shapeAppearanceOverlay="@style/RoundedShape"/>
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomNavigationView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:menu="@menu/menu_main_relocate_item"
+                app:labelVisibilityMode="labeled"
+                app:itemIconTint="@android:color/white"
+                app:itemTextColor="@android:color/white"
+                app:backgroundTint="@color/primary"
+                app:itemRippleColor="@color/primary"
+                app:itemActiveIndicatorStyle="@null"
+                app:layout_anchor="@id/scrollView"
+                app:layout_anchorGravity="bottom"
+                app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"/>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <com.google.android.material.navigation.NavigationView
@@ -64,6 +80,6 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:fitsSystemWindows="true"
-            app:headerLayout="@layout/header_main"/>
+            app:headerLayout="@layout/header_main" />
     </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

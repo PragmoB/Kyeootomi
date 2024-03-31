@@ -14,7 +14,7 @@ class HitomiItem(
 
     val filesDir : File
         get() {
-            val filesDir = File(collection.dir, "/hitomi-$_no")
+            val filesDir = File(Item.filesDir, "/hitomi-$_no")
             if (!filesDir.exists())
                 filesDir.mkdirs()
             return filesDir

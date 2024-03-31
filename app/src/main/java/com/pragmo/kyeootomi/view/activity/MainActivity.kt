@@ -106,10 +106,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toggle = ActionBarDrawerToggle(this, binding.drawer,
+        toggle = object: ActionBarDrawerToggle(this, binding.drawer,
             R.string.drawer_opened,
             R.string.drawer_closed
-        )
+        ) {
+            override fun onDrawerClosed(drawerView: View) {
+                super.onDrawerClosed(drawerView)
+                viewModel.loadItems()
+            }
+        }
+        binding.drawer.addDrawerListener(toggle)
         toggle.syncState()
 
         /* 레이아웃 조정 */

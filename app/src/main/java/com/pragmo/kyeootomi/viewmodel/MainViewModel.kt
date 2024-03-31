@@ -120,7 +120,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setCollection(numCollection: Int?) {
         _collection.value = collectionModel.get(numCollection)
-        loadItems()
         loadSubCollections()
     }
     fun revertCollection() {

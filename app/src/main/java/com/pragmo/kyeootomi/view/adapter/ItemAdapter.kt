@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ItemCustomBinding
 import com.pragmo.kyeootomi.databinding.ItemHitomiBinding
@@ -79,7 +80,9 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
             if (cover != null) {
                 binding.wrapCoverError.visibility = View.GONE
                 binding.imgCover.visibility = View.VISIBLE
-                binding.imgCover.setImageURI(Uri.fromFile(cover))
+                Glide.with(binding.root)
+                    .load(cover)
+                    .into(binding.imgCover)
             }
             binding.imgCover.setOnClickListener {
                 val intentHitomiView = Intent(binding.root.context, ReadHitomiActivity::class.java)
@@ -168,7 +171,8 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
             checkView.visibility = View.GONE
         checkView.isChecked = false
         ToggleAnimation.toggleArrow(imgArrow, false, 0)
-        expandableView.visibility = View.VISIBLE // 이거 한줄 추가했더니 wrapViewHeight값 계산이 멀쩡하게 잘된다. 대체왜..?
+        rootItem.visibility = View.INVISIBLE
+        expandableView.visibility = View.INVISIBLE // 이거 한줄 추가했더니 wrapViewHeight값 계산이 멀쩡하게 잘된다. 대체왜..?
         expandableView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
         expandableView.requestLayout()
         // 항목 꾹 눌러서 선택하기 설정
@@ -187,6 +191,10 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
                 expandableHeight = expandableView.height
                 expandableView.layoutParams.height = 0
                 expandableView.requestLayout()
+                Handler(Looper.getMainLooper()).post {
+                    expandableView.visibility = View.VISIBLE
+                    rootItem.visibility = View.VISIBLE
+                }
                 expandableView.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })

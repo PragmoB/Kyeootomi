@@ -32,7 +32,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:paddingVertical="15dp"
-            android:text="error loading title"
+            android:text="제목을 불러오는 중.."
             android:textSize="16sp"
             android:layout_weight="1"
             android:maxLines="1"

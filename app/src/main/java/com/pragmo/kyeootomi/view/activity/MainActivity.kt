@@ -110,6 +110,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.string.drawer_opened,
             R.string.drawer_closed
         ) {
+            override fun onDrawerOpened(drawerView: View) {
+                super.onDrawerOpened(drawerView)
+                binding.recyclerDocument.adapter = ItemAdapter(mutableListOf(), true) {}
+            }
             override fun onDrawerClosed(drawerView: View) {
                 super.onDrawerClosed(drawerView)
                 viewModel.loadItems()

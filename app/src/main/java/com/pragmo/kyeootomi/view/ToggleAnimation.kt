@@ -26,7 +26,7 @@ class ToggleAnimation {
                 arrow.animate().setDuration(0)
 
             if (expand)
-                animator.rotation(180f)
+                animator.rotation(-180f)
             else
                 animator.rotation(0f)
         }

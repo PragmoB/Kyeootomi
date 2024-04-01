@@ -110,13 +110,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.string.drawer_opened,
             R.string.drawer_closed
         ) {
-            override fun onDrawerOpened(drawerView: View) {
-                super.onDrawerOpened(drawerView)
-                binding.recyclerDocument.adapter = ItemAdapter(mutableListOf(), true) {}
-            }
             override fun onDrawerClosed(drawerView: View) {
                 super.onDrawerClosed(drawerView)
-                viewModel.loadItems()
+                if (binding.recyclerDocument.adapter?.itemCount == 0)
+                    viewModel.loadItems()
             }
         }
         binding.drawer.addDrawerListener(toggle)
@@ -316,6 +313,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Handler(mainLooper).post {
                     viewModel.revertCollection()
                 }
+                binding.recyclerDocument.adapter = ItemAdapter(mutableListOf(), true) {}
             }
             R.id.menuAddCollection -> {
                 viewModel.formCollectionName.value = ""
@@ -375,6 +373,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Handler(mainLooper).post {
                     viewModel.setCollection(item.itemId)
                 }
+                binding.recyclerDocument.adapter = ItemAdapter(mutableListOf(), true) {}
             }
         }
         return true

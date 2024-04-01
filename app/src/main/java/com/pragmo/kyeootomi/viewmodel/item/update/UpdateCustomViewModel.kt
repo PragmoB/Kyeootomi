@@ -16,7 +16,7 @@ class UpdateCustomViewModel(application: Application) : UpdateItemViewModel(appl
     override fun setItem(numItem: Int) {
         _customItem.value = itemModel.getCustom(numItem)
         val customItemValue = _customItem.value ?: return
-        title.value = customItemValue.title
+        title.value = customItemValue.title ?: ""
         url.value = customItemValue.url
     }
     override fun commit(onComplete: (Boolean) -> Unit): Boolean {

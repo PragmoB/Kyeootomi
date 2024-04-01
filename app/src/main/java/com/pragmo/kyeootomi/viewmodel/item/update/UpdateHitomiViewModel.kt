@@ -30,7 +30,7 @@ class UpdateHitomiViewModel(application: Application) : UpdateItemViewModel(appl
     override fun setItem(numItem : Int) {
         _hitomiItem.value = itemModel.getHitomi(numItem)
         val hitomiItemValue = _hitomiItem.value ?: return
-        title.value = hitomiItemValue.title
+        title.value = hitomiItemValue.title ?: ""
         number.value = hitomiItemValue.number
     }
 

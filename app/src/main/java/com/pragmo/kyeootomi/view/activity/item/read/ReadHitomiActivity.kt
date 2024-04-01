@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -108,13 +109,15 @@ class ReadHitomiActivity : AppCompatActivity() {
         return super.onSupportNavigateUp()
     }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_hitomi_view, menu)
+        menuInflater.inflate(R.menu.menu_read_hitomi, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            R.id.menuSaveCurrentManga -> {}
+            R.id.menuSaveCurrentManga -> {
+                Toast.makeText(this, "열심히 구현중입니다. 죄송합니다", Toast.LENGTH_SHORT).show()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

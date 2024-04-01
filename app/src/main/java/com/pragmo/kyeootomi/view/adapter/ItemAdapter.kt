@@ -143,7 +143,7 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
                     }
                 })
                 binding.btnWebview.setOnClickListener {
-                    Toast.makeText(binding.root.context, "히토미 보기 페이지로 넘어가야함", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(binding.root.context, "열심히 구현중입니다. 죄송합니다", Toast.LENGTH_SHORT).show()
                 }
 
                 IntersectedViews(binding.rootItem, binding.expandableView, binding.check, binding.imgArrow)
@@ -154,7 +154,7 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
                 holder.bind(customItem)
 
                 binding.btnWebview.setOnClickListener {
-                    Toast.makeText(binding.root.context, "웹뷰 페이지로 넘어가야함", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(binding.root.context, "열심히 구현중입니다. 죄송합니다", Toast.LENGTH_SHORT).show()
                 }
 
                 IntersectedViews(binding.rootItem, binding.expandableView, binding.check, binding.imgArrow)

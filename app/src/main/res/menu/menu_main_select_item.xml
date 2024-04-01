@@ -14,4 +14,7 @@
     <item
         android:id="@+id/menuMoveCollection"
         android:title="컬렉션 이동"/>
+    <item
+        android:id="@+id/menuSaveGallery"
+        android:title="갤러리에 복사"/>
 </menu>

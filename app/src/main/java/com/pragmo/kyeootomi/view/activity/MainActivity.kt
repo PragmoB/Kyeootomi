@@ -292,6 +292,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
                 mode = Mode.RELOCATE_ITEM
             }
+            R.id.menuSaveGallery -> {
+                Toast.makeText(this, "열심히 구현중입니다. 죄송합니다", Toast.LENGTH_SHORT).show()
+                return false
+            }
         }
         return super.onOptionsItemSelected(menuItem)
     }

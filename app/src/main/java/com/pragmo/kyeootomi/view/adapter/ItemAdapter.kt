@@ -1,7 +1,6 @@
 package com.pragmo.kyeootomi.view.adapter
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
@@ -13,7 +12,6 @@ import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.pragmo.kyeootomi.R
@@ -25,6 +23,7 @@ import com.pragmo.kyeootomi.model.data.HitomiItem
 import com.pragmo.kyeootomi.model.data.Item
 import com.pragmo.kyeootomi.view.ToggleAnimation
 import com.pragmo.kyeootomi.view.activity.item.read.ReadHitomiActivity
+import com.pragmo.kyeootomi.view.activity.item.OnlineViewerActivity
 
 class ItemAdapter(private val items : MutableList<Item>, private val bindList: Boolean, private val onLongClickItemListener: (ItemAdapter) -> Unit)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -94,7 +93,7 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
     internal class CustomViewHolder(val binding : ItemCustomBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(customItem: CustomItem) {
             binding.txtTitle.text = customItem.title ?: "제목을 불러올 수 없습니다"
-            binding.txtURL.text = customItem.url
+            binding.txtURL.text = "URL: ${customItem.url}"
         }
     }
 
@@ -143,7 +142,9 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
                     }
                 })
                 binding.btnWebview.setOnClickListener {
-                    Toast.makeText(binding.root.context, "열심히 구현중입니다. 죄송합니다", Toast.LENGTH_SHORT).show()
+                    val intentReadOnline = Intent(binding.root.context, OnlineViewerActivity::class.java)
+                    intentReadOnline.putExtra("url", "https://${Item.ItemType.HITOMI.domain}/reader/${hitomiItem.number}.html#1")
+                    binding.root.context.startActivity(intentReadOnline)
                 }
 
                 IntersectedViews(binding.rootItem, binding.expandableView, binding.check, binding.imgArrow)
@@ -154,7 +155,9 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
                 holder.bind(customItem)
 
                 binding.btnWebview.setOnClickListener {
-                    Toast.makeText(binding.root.context, "열심히 구현중입니다. 죄송합니다", Toast.LENGTH_SHORT).show()
+                    val intentReadOnline = Intent(binding.root.context, OnlineViewerActivity::class.java)
+                    intentReadOnline.putExtra("url", customItem.url)
+                    binding.root.context.startActivity(intentReadOnline)
                 }
 
                 IntersectedViews(binding.rootItem, binding.expandableView, binding.check, binding.imgArrow)

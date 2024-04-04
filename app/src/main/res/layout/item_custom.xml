@@ -47,24 +47,17 @@
             android:src="@drawable/baseline_expand_more_24"/>
     </LinearLayout>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/expandableView"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp">
-
-        <TextView
-            android:id="@+id/txtWebTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="제목 : " />
+        android:padding="20dp">
 
         <TextView
             android:id="@+id/txtURL"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:text="URL : " />
         <Button
             android:id="@+id/btnWebview"

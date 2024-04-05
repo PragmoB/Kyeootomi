@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ItemCustomBinding
 import com.pragmo.kyeootomi.databinding.ItemHitomiBinding
@@ -81,6 +82,7 @@ class ItemAdapter(private val items : MutableList<Item>, private val bindList: B
                 binding.imgCover.visibility = View.VISIBLE
                 Glide.with(binding.root)
                     .load(cover)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(binding.imgCover)
             }
             binding.imgCover.setOnClickListener {

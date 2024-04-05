@@ -116,7 +116,10 @@ class ReadHitomiActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.menuSaveCurrentManga -> {
-                Toast.makeText(this, "열심히 구현중입니다. 죄송합니다", Toast.LENGTH_SHORT).show()
+                if (viewModel.copyToGallery())
+                    Toast.makeText(this, "복사되었습니다", Toast.LENGTH_SHORT).show()
+                else
+                    Toast.makeText(this, "복사에 실패했습니다", Toast.LENGTH_SHORT).show()
             }
         }
         return super.onOptionsItemSelected(item)

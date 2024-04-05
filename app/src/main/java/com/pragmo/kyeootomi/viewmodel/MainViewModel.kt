@@ -110,6 +110,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         itemsValue.add(index, item)
     }
+    fun copyItemToGallery(index: Int) {
+        val itemsValue = _listItems.value ?: return
+        itemModel.copyToGallery(itemsValue[index])
+    }
     fun deleteItem(index: Int) {
         val itemsValue = _listItems.value ?: return
 

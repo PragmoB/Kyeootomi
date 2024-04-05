@@ -44,4 +44,10 @@ class ReadHitomiViewModel(application: Application) : AndroidViewModel(applicati
         if (numPageValue > 1)
             numPage.value = numPageValue - 1
     }
+    fun copyToGallery(): Boolean {
+        val hitomiItemValue = _hitomiItem.value ?: return false
+        val numPageValue = numPage.value ?: return false
+
+        return itemModel.copyToGallery(hitomiItemValue, numPageValue)
+    }
 }

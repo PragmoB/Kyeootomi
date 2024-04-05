@@ -6,8 +6,10 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
@@ -19,6 +21,10 @@ import com.pragmo.kyeootomi.model.data.HitomiItem
 import com.pragmo.kyeootomi.model.data.Item
 import org.jsoup.Jsoup
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.io.OutputStream
 
 class ItemModel(private val context : Context) {
 
@@ -516,6 +522,34 @@ class ItemModel(private val context : Context) {
             onGetInfoComplete(null)
 
     }
+    fun copyToGallery(hitomiItem: HitomiItem, order: Int): Boolean {
+
+        val contentResolver = context.contentResolver
+        val picturesCollection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            .resolve("Kyeootomi").mkdirs()
+        val file = hitomiItem.getFile(order) ?: return false
+
+        // 파일 정보 설정
+        val imageDetails = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, file.name)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/${file.extension}")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Kyeootomi")
+        }
+
+        // 파일을 삽입하기 위해 ContentResolver를 사용하여 OutputStream을 엽니다.
+        val insertedImageUri = contentResolver.insert(picturesCollection, imageDetails) ?: return false
+        val outputStream = contentResolver.openOutputStream(insertedImageUri) as FileOutputStream
+
+        // 이미지 파일을 읽기 위해 FileInputStream을 엽니다.
+        val inputStream = FileInputStream(file)
+
+        // InputStream에서 이미지 파일을 읽어서 OutputStream에 씁니다.
+        inputStream.copyTo(outputStream)
+
+        return true
+    }
     fun deleteHitomi(hitomiItem: HitomiItem) {
         hitomiItem.filesDir.deleteRecursively()
 
@@ -625,6 +659,46 @@ class ItemModel(private val context : Context) {
         val db = ItemDBHelper(context).writableDatabase
         db.update("HitomiItem", values, null, null)
         db.update("CustomItem", values, null, null)
+    }
+    fun copyToGallery(item: Item) {
+
+        when (item) {
+            is HitomiItem -> {
+
+                val contentResolver = context.contentResolver
+                val picturesCollection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                    .resolve("Kyeootomi/${item.title}").mkdirs()
+
+                // 폴더 내 모든 파일에 대해 반복
+                item.filesDir.listFiles()?.forEach { file ->
+                    // 파일이 이미지인지 확인
+                    if (!file.isFile)
+                        return@forEach
+                    if (file.extension !in arrayOf("jpg", "jpeg", "png", "webp", "avif"))
+                        return@forEach
+
+                    // 파일 정보 설정
+                    val imageDetails = ContentValues().apply {
+                        put(MediaStore.Images.Media.DISPLAY_NAME, file.name)
+                        put(MediaStore.Images.Media.MIME_TYPE, "image/${file.extension}")
+                        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Kyeootomi/${item.title}")
+                    }
+
+                    // 파일을 삽입하기 위해 ContentResolver를 사용하여 OutputStream을 엽니다.
+                    val insertedImageUri = contentResolver.insert(picturesCollection, imageDetails) ?: return@forEach
+                    val outputStream = contentResolver.openOutputStream(insertedImageUri) as FileOutputStream
+
+                    // 이미지 파일을 읽기 위해 FileInputStream을 엽니다.
+                    val inputStream = FileInputStream(file)
+
+                    // InputStream에서 이미지 파일을 읽어서 OutputStream에 씁니다.
+                    inputStream.copyTo(outputStream)
+                }
+            }
+
+            else -> {}
+        }
     }
     fun deleteByCollection(numCollection: Int?) {
         val items = getByCollection(numCollection)

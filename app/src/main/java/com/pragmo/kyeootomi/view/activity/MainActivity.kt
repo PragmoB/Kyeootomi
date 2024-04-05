@@ -2,7 +2,6 @@ package com.pragmo.kyeootomi.view.activity
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.Menu
@@ -15,6 +14,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -27,6 +27,11 @@ import com.pragmo.kyeootomi.view.activity.item.AddItemActivity
 import com.pragmo.kyeootomi.view.activity.item.UpdateItemActivity
 import com.pragmo.kyeootomi.view.adapter.ItemAdapter
 import com.pragmo.kyeootomi.viewmodel.MainViewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -228,6 +233,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (intentResult.getStringExtra("result") == "complete")
             mode = Mode.DEFAULT
     }
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         if (toggle.onOptionsItemSelected(menuItem))
             return true
@@ -270,9 +276,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 dlg.setNegativeButton("취소", null)
                 dlg.setPositiveButton("확인") { _, _ ->
                     selectedItemIndexes.sortDescending()
-                    for (selectedItemIndex in selectedItemIndexes) {
-                        viewModel.deleteItem(selectedItemIndex)
-                        itemAdapter.deleteItem(selectedItemIndex)
+                    selectedItemIndexes.forEach {
+                        viewModel.deleteItem(it)
+                        itemAdapter.deleteItem(it)
                     }
                     Toast.makeText(this, "삭제되었습니다", Toast.LENGTH_SHORT).show()
                     mode = Mode.DEFAULT
@@ -286,15 +292,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 selectedItemIndexes.sortDescending()
-                for (selectedItemIndex in selectedItemIndexes) {
-                    viewModel.requeueItemIntoWaiting(selectedItemIndex)
-                    itemAdapter.deleteItem(selectedItemIndex)
+                selectedItemIndexes.forEach {
+                    viewModel.requeueItemIntoWaiting(it)
+                    itemAdapter.deleteItem(it)
                 }
                 mode = Mode.RELOCATE_ITEM
             }
             R.id.menuSaveGallery -> {
-                Toast.makeText(this, "열심히 구현중입니다. 죄송합니다", Toast.LENGTH_SHORT).show()
-                return false
+                Toast.makeText(this, "복사에 다소 시간이 필요합니다. 잠시만 기다려주세요", Toast.LENGTH_SHORT).show()
+                GlobalScope.launch(Dispatchers.Main) {
+                    withContext(Dispatchers.Default) {
+                        selectedItemIndexes.forEach {
+                            viewModel.copyItemToGallery(it)
+                        }
+                    }
+                    Toast.makeText(this@MainActivity, "갤러리에 복사되었습니다", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         return super.onOptionsItemSelected(menuItem)

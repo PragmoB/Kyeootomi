@@ -379,7 +379,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 dlg.setMessage("남아있는 작품 및\n하위 컬렉션이 모두 삭제됩니다.\n${collectionValue.name}을(를) 삭제하시겠습니까?")
                 dlg.setPositiveButton("확인") { _, _ ->
                     viewModel.deleteCollection()
-                    viewModel.revertCollection()
+                    binding.recyclerDocument.adapter = ItemAdapter(mutableListOf(), true) {}
                 }
                 dlg.show()
             }

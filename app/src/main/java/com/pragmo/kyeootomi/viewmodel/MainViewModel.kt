@@ -55,6 +55,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     fun deleteCollection() {
         val collectionValue = _collection.value ?: return
+        revertCollection()
         collectionModel.delete(collectionValue)
     }
 

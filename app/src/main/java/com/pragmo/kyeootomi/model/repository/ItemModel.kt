@@ -406,6 +406,9 @@ class ItemModel(private val context : Context) {
     }
     fun getHitomiByCollection(numCollection : Int?) : List<HitomiItem> {
 
+        val collectionModel = CollectionModel(context)
+        val collection = collectionModel.get(numCollection)!!
+
         // db에서 cursor참조
 
         val db = ItemDBHelper(context).readableDatabase
@@ -419,13 +422,11 @@ class ItemModel(private val context : Context) {
 
         // cursor를 돌며 히토미 작품 항목들을 뽑아냄
 
-        val collectionModel = CollectionModel(context)
         while (cursor.moveToNext()) {
-            val collection = collectionModel.get(numCollection)!!
             val item = Item(
                 Item.ItemType.HITOMI,
                 cursor.getInt(0),
-                collection,
+                collection.copy(),
                 if (cursor.isNull(1)) null else cursor.getString(1))
 
             val hitomiItem = HitomiItem(

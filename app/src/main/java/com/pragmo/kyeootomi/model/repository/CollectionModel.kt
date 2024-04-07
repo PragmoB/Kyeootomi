@@ -100,12 +100,13 @@ class CollectionModel(private val context : Context) {
     /* numCollection번 컬렉션 및 하위 컬렉션, 하위 작품 삭제 */
 
     fun delete(collection: Collection) {
+        val itemModel = ItemModel(context)
+        itemModel.deleteByCollection(collection.num)
+
         // numCollection번 컬렉션 및 numCollection번 컬렉션의 작품 db 데이터 삭제
         val db = CollectionDBHelper(context).writableDatabase
-        val itemModel = ItemModel(context)
         if (collection.num != null)
             db.delete("Collection", "_no=?", arrayOf(collection.num.toString()))
-        itemModel.deleteByCollection(collection.num)
 
         // numCollection번 컬렉션의 하위 컬렉션 모두 삭제
         val subCollections = getSubCollections(collection.num)

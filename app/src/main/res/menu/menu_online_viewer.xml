@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item
+        android:id="@+id/menuAddItem"
+        android:iconTint="@android:color/white"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="현재 작품 추가"
+        app:showAsAction="always"/>
     <item
         android:id="@+id/menuChangeSite"
         android:title="사이트 변경.."/>
-    <item
-        android:id="@+id/menuShowURL"
-        android:title="URL 확인"/>
 </menu>

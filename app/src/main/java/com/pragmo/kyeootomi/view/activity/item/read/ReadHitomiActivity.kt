@@ -117,7 +117,7 @@ class ReadHitomiActivity : AppCompatActivity() {
         when(item.itemId) {
             R.id.menuSaveCurrentManga -> {
                 if (viewModel.copyToGallery())
-                    Toast.makeText(this, "복사되었습니다", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "갤러리에 복사되었습니다", Toast.LENGTH_SHORT).show()
                 else
                     Toast.makeText(this, "복사에 실패했습니다", Toast.LENGTH_SHORT).show()
             }

@@ -1,5 +1,6 @@
 package com.pragmo.kyeootomi.view.activity.item
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -7,6 +8,7 @@ import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityAddItemBinding
@@ -25,8 +27,47 @@ class AddItemActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val numCollection = intent.getIntExtra("numCollection", 0)
-        viewModel = ViewModelProvider(this)[AddItemViewModel::class.java]
+        val itemType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra("itemType", Item.ItemType::class.java) ?: Item.ItemType.HITOMI
+        } else {
+            (intent.getSerializableExtra("itemType") ?: Item.ItemType.HITOMI) as Item.ItemType
+        }
+        viewModel = when (itemType) {
+            Item.ItemType.HITOMI -> {
+                val hitomiViewModel = ViewModelProvider(this)[AddHitomiViewModel::class.java]
+                intent.getStringExtra("title")?.let {
+                    hitomiViewModel.titleOpt.value = R.id.radioSetCustomTitle
+                    hitomiViewModel.title.value = it
+                } ?: run {
+                    hitomiViewModel.titleOpt.value = R.id.radioSetAutoTitle
+                }
+                intent.getIntExtra("number", 0).let {
+                    if (it != 0)
+                        hitomiViewModel.number.value = it.toString()
+                }
+                intent.getBooleanExtra("downloaded", false).let {
+                    if (it)
+                        hitomiViewModel.downloadOpt.value = R.id.radioLocalDownload
+                    else
+                        hitomiViewModel.downloadOpt.value = R.id.radioNoDownload
+                }
+
+                hitomiViewModel
+            }
+
+            Item.ItemType.CUSTOM -> {
+                val customViewModel = ViewModelProvider(this)[AddCustomViewModel::class.java]
+                intent.getStringExtra("title")?.let {
+                    customViewModel.title.value = it
+                }
+                intent.getStringExtra("url")?.let {
+                    customViewModel.url.value = it
+                }
+                customViewModel
+            }
+        }
         viewModel.setCollection(if (numCollection == 0) null else numCollection)
+        viewModel.contentsProviderOrdinal.value = itemType.ordinal
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_item)
         setContentView(binding.root)
@@ -64,7 +105,6 @@ class AddItemActivity : AppCompatActivity() {
                 Item.ItemType.CUSTOM -> ViewModelProvider(this)[AddCustomViewModel::class.java]
             }.apply {
                 setCollection(if (numCollection == 0) null else numCollection)
-                contentsProviderOrdinal.value = contentsProvider.ordinal
             }
             val fragment = when (contentsProvider) {
                 Item.ItemType.HITOMI -> AddHitomiFragment.newInstance()
@@ -75,9 +115,6 @@ class AddItemActivity : AppCompatActivity() {
             transaction.replace(R.id.fragmentInput, fragment)
             transaction.commit()
         }
-
-        // 일단은 히토미로 선택
-        viewModel.contentsProviderOrdinal.value = Item.ItemType.HITOMI.ordinal
     }
     override fun onSupportNavigateUp(): Boolean {
         finish()
@@ -89,9 +126,10 @@ class AddItemActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val onCommitComplete: (Boolean) -> Unit = {
+        val onCommitComplete: (Boolean) -> Unit = onCommitComplete@{
+            val collectionValue = viewModel.collection.value ?: return@onCommitComplete
             if (it)
-                Toast.makeText(this, "추가되었습니다", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "${collectionValue.name}에 추가되었습니다", Toast.LENGTH_SHORT).show()
         }
         when (item.itemId) {
             R.id.menuComplete -> {

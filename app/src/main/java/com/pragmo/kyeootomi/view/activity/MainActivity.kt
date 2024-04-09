@@ -24,6 +24,7 @@ import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityMainBinding
 import com.pragmo.kyeootomi.databinding.DialogFormCollectionBinding
 import com.pragmo.kyeootomi.view.activity.item.AddItemActivity
+import com.pragmo.kyeootomi.view.activity.item.OnlineViewerActivity
 import com.pragmo.kyeootomi.view.activity.item.UpdateItemActivity
 import com.pragmo.kyeootomi.view.adapter.ItemAdapter
 import com.pragmo.kyeootomi.viewmodel.MainViewModel
@@ -138,8 +139,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             binding.refreshDocument.isEnabled = binding.scrollView.scrollY == 0
         }
         binding.btnAddItem.setOnClickListener {
-            val intentAddItem = Intent(this, AddItemActivity::class.java)
-            intentAddItem.putExtra("numCollection", viewModel.collection.value!!.num)
+            val intentAddItem = Intent(this, OnlineViewerActivity::class.java)
             startActivity(intentAddItem)
         }
         binding.naviView.setNavigationItemSelectedListener(this)

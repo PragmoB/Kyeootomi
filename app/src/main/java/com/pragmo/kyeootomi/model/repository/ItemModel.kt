@@ -534,7 +534,7 @@ class ItemModel(private val context : Context) {
 
         // 파일 정보 설정
         val imageDetails = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, file.name)
+            put(MediaStore.Images.Media.DISPLAY_NAME, "${hitomiItem.title ?: "제목불명"}-${file.name}")
             put(MediaStore.Images.Media.MIME_TYPE, "image/${file.extension}")
             put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Kyeootomi")
         }

@@ -14,7 +14,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -23,7 +22,6 @@ import com.google.android.material.navigation.NavigationView
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityMainBinding
 import com.pragmo.kyeootomi.databinding.DialogFormCollectionBinding
-import com.pragmo.kyeootomi.view.activity.item.AddItemActivity
 import com.pragmo.kyeootomi.view.activity.item.OnlineViewerActivity
 import com.pragmo.kyeootomi.view.activity.item.UpdateItemActivity
 import com.pragmo.kyeootomi.view.adapter.ItemAdapter
@@ -34,7 +32,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var viewModel : MainViewModel
     private lateinit var binding : ActivityMainBinding
@@ -53,7 +51,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     if (::menu.isInitialized)
                         menu.clear()
                     itemAdapter.selectMode = false
-                    binding.btnAddItem.visibility = View.VISIBLE
+                    binding.btnStartOnlineViewer.visibility = View.VISIBLE
                     viewModel.listItemsWaitingToRelocate.value?.let {
                         val collectionValue = viewModel.collection.value!!
                         if (it[0].collection.num == collectionValue.num)
@@ -69,7 +67,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     if (!menu.hasVisibleItems() && ::menu.isInitialized)
                         menuInflater.inflate(R.menu.menu_main_select_item, menu)
                     itemAdapter.selectMode = true
-                    binding.btnAddItem.visibility = View.GONE
+                    binding.btnStartOnlineViewer.visibility = View.GONE
                     viewModel.listItemsWaitingToRelocate.value?.let {
                         val collectionValue = viewModel.collection.value!!
                         if (it[0].collection.num == collectionValue.num)
@@ -84,7 +82,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Mode.RELOCATE_ITEM -> {
                     menu.clear()
                     itemAdapter.selectMode = false
-                    binding.btnAddItem.visibility = View.GONE
+                    binding.btnStartOnlineViewer.visibility = View.GONE
                     viewModel.listItemsWaitingToRelocate.value!!
                     binding.bottomNavigationView.visibility = View.VISIBLE
                 }
@@ -96,10 +94,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.setCollection(null)
 
-        super.onCreate(savedInstanceState)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -138,9 +137,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.scrollView.viewTreeObserver.addOnScrollChangedListener {
             binding.refreshDocument.isEnabled = binding.scrollView.scrollY == 0
         }
-        binding.btnAddItem.setOnClickListener {
-            val intentAddItem = Intent(this, OnlineViewerActivity::class.java)
-            startActivity(intentAddItem)
+        binding.btnStartOnlineViewer.setOnClickListener {
+            val intentOnlineViewer = Intent(this, OnlineViewerActivity::class.java)
+            startActivity(intentOnlineViewer)
         }
         binding.naviView.setNavigationItemSelectedListener(this)
         val backPressedCallback = object : OnBackPressedCallback(true) {

@@ -1,7 +1,6 @@
 package com.pragmo.kyeootomi.view.activity.item
 
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -11,13 +10,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityUpdateItemBinding
 import com.pragmo.kyeootomi.model.data.Item
+import com.pragmo.kyeootomi.view.activity.BaseActivity
 import com.pragmo.kyeootomi.view.fragment.item.update.UpdateCustomFragment
 import com.pragmo.kyeootomi.view.fragment.item.update.UpdateHitomiFragment
 import com.pragmo.kyeootomi.viewmodel.item.update.UpdateCustomViewModel
 import com.pragmo.kyeootomi.viewmodel.item.update.UpdateHitomiViewModel
 import com.pragmo.kyeootomi.viewmodel.item.update.UpdateItemViewModel
 
-class UpdateItemActivity : AppCompatActivity() {
+class UpdateItemActivity : BaseActivity() {
     private lateinit var binding : ActivityUpdateItemBinding
     private lateinit var viewModel : UpdateItemViewModel
 

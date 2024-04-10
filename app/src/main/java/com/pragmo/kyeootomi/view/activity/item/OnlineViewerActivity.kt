@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -25,9 +24,10 @@ import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityOnlineViewerBinding
 import com.pragmo.kyeootomi.databinding.DialogFormUrlBinding
 import com.pragmo.kyeootomi.model.data.Item
+import com.pragmo.kyeootomi.view.activity.BaseActivity
 import com.pragmo.kyeootomi.viewmodel.item.OnlineViewerViewModel
 
-class OnlineViewerActivity : AppCompatActivity() {
+class OnlineViewerActivity : BaseActivity() {
     private lateinit var binding: ActivityOnlineViewerBinding
     private lateinit var viewModel: OnlineViewerViewModel
 

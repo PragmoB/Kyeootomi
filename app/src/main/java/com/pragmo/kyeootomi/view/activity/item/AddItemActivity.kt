@@ -1,25 +1,24 @@
 package com.pragmo.kyeootomi.view.activity.item
 
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityAddItemBinding
 import com.pragmo.kyeootomi.model.data.Item
+import com.pragmo.kyeootomi.view.activity.BaseActivity
 import com.pragmo.kyeootomi.view.fragment.item.add.AddCustomFragment
 import com.pragmo.kyeootomi.view.fragment.item.add.AddHitomiFragment
 import com.pragmo.kyeootomi.viewmodel.item.add.AddCustomViewModel
 import com.pragmo.kyeootomi.viewmodel.item.add.AddHitomiViewModel
 import com.pragmo.kyeootomi.viewmodel.item.add.AddItemViewModel
 
-class AddItemActivity : AppCompatActivity() {
+class AddItemActivity : BaseActivity() {
 
     private lateinit var viewModel : AddItemViewModel
     private lateinit var binding : ActivityAddItemBinding

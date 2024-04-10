@@ -1,7 +1,6 @@
 package com.pragmo.kyeootomi.view.activity.item.read
 
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,10 +11,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.pragmo.kyeootomi.R
 import com.pragmo.kyeootomi.databinding.ActivityReadHitomiBinding
+import com.pragmo.kyeootomi.view.activity.BaseActivity
 import com.pragmo.kyeootomi.viewmodel.item.read.ReadHitomiViewModel
 import java.io.File
 
-class ReadHitomiActivity : AppCompatActivity() {
+class ReadHitomiActivity : BaseActivity() {
 
     private lateinit var viewModel : ReadHitomiViewModel
     private lateinit var binding : ActivityReadHitomiBinding

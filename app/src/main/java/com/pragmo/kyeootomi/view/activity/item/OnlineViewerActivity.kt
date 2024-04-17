@@ -42,7 +42,7 @@ class OnlineViewerActivity : BaseActivity() {
         when (uri.host) {
             Item.ItemType.HITOMI.domain -> run {
                 val splitSlash = url.split("/")
-                val splitDot = splitSlash[splitSlash.size - 1].split(".")
+                val splitDot = splitSlash[splitSlash.size - 1].split(".html")
 
                 // url이 https://hitomi.la/reader/(뽑아낼 번호).html#(대충 숫자) 형태였던 경우
                 val number = splitDot[0].toIntOrNull() ?: run {

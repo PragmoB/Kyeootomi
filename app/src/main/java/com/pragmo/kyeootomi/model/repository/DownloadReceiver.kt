@@ -4,21 +4,14 @@ import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.Uri
-import android.os.Environment
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
-import android.widget.Toast
 
 class DownloadReceiver : BroadcastReceiver() {
-    interface onCompleteListener {
+    interface OnCompleteListener {
         fun onSuccess()
         fun onFail()
     }
 
-    private val onCompleteCallbacks = mutableMapOf<Long, onCompleteListener>()
+    private val onCompleteCallbacks = mutableMapOf<Long, OnCompleteListener>()
 
     override fun onReceive(context: Context, intent: Intent) {
         val downId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
@@ -37,7 +30,7 @@ class DownloadReceiver : BroadcastReceiver() {
             onCompleteCallbacks[downId]?.onSuccess()
         onCompleteCallbacks.remove(downId)
     }
-    fun setOnCompleteListener(downId: Long, callback: onCompleteListener) {
+    fun setOnCompleteListener(downId: Long, callback: OnCompleteListener) {
         onCompleteCallbacks[downId] = callback
     }
 }

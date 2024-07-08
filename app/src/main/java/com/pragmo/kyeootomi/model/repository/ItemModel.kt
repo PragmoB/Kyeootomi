@@ -23,8 +23,6 @@ import org.jsoup.Jsoup
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.OutputStream
 
 class ItemModel(private val context : Context) {
 
@@ -51,7 +49,7 @@ class ItemModel(private val context : Context) {
         class MyJavascriptInterface {
             var completeGallery = false
 
-            val objOnCompleteListener = object : DownloadReceiver.onCompleteListener {
+            val objOnCompleteListener = object : DownloadReceiver.OnCompleteListener {
                 override fun onSuccess() {
                     if (orders.size > 1)
                         Toast.makeText(context, "히토미 ${number}번 작품 ${orders[0]}번 이미지 다운로드 성공(${orders.size - 1}개 남음)", Toast.LENGTH_SHORT).show()
